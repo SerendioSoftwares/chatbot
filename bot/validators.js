@@ -17,6 +17,18 @@ lib.dialog('size', basicPrompterWithExpressionSize(function (input) {
     return input < 13 && input > 7;
 }));
 
+lib.dialog('price', basicPrompterWithExpression(function (input) {
+    return (input>30 && input<120);
+}));
+
+lib.dialog('qty', basicPrompterWithExpression(function (input) {
+    return (input>0 && input<11);
+}));
+
+lib.dialog('category', basicPrompterWithExpression(function (input) {
+    return (input==="Formal Shoes" || input==="Sports Shoes");
+}));
+
 lib.dialog('phonenumber', basicPrompterWithRegex(PhoneRegex));
 
 lib.dialog('email', basicPrompterWithRegex(EmailRegex));

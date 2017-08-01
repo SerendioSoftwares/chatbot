@@ -81,7 +81,10 @@ lib.dialog('/', [
     },
     function(session, args)
     {
-        builder.Prompts.number(session, "How many would you like?");
+        session.beginDialog('validators:qty', {
+            prompt: session.send("How many would you like?"),
+            retryPrompt: session.gettext('Enter a number between 1 and 10')
+        });
     },
     function(session, args)
     {

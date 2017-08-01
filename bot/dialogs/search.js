@@ -18,17 +18,18 @@ lib.dialog('/', [
         .attachmentLayout(builder.AttachmentLayout.carousel)
         .attachments(cards);
 
-        session.send(reply);
+
+        session.beginDialog('validators:category', {
+            prompt: session.send(reply),
+            retryPrompt: session.gettext('Choose one from the given categories')
+        });
         next();     
 
         
         
         
     },
-    function (session,args)
-    {
-        builder.Prompts.text(session, "What would you like?");
-    },
+    
         // Category selected
     function (session, args, next) {
        
@@ -58,21 +59,29 @@ lib.dialog('/', [
         session.dialogData.recipientSize=args.response;
         console.log("------------")
         console.log(session.userData.category)
-        // Retrieve address, continue to shop
 
-        // xhr.open("GET", model+session.dialogData.search, false);
-        // xhr.send(xhr.responseText);
-        // console.log(xhr.responseText)
-        // var json = JSON.parse(xhr.responseText);
-        // input=json["entities"][0]["entity"];
-        // session.message.text=input;
-        // var search = builder;
+        session.send("What Price range are you in for?");
+        var welcomeCard = new builder.HeroCard(session)
+        .buttons([
+            builder.CardAction.imBack(session, "40", "Less than $40"),
+            builder.CardAction.imBack(session, "60", "$40-$60"),
+            builder.CardAction.imBack(session, "80", "$60-$80"),
+            builder.CardAction.imBack(session, "80", "Above $80"),
+        ]);
+        session.beginDialog('validators:price', {
+            prompt: session.send(new builder.Message(session)
+        .addAttachment(welcomeCard)),
+            retryPrompt: session.gettext('Choose one from the given options')
+        });
+        
+
+        
 
         
     },
     function (session, args, next) {
-    	session.dialogData.recipientSize=args.response;
-        
+    	session.dialogData.priceRange=args.response;
+
         // Retrieve address, continue to shop
 
         // xhr.open("GET", model+session.dialogData.search, false);
@@ -83,7 +92,7 @@ lib.dialog('/', [
         // session.message.text=input;
         // var search = builder;
 
-        session.beginDialog('product-selection:/', {category: session.dialogData.category, size : session.dialogData.recipientSize});
+        session.beginDialog('product-selection:/', {category: session.dialogData.category, size : session.dialogData.recipientSize, price : session.dialogData.priceRange});
     },
     function (session, args, next) {
         // Logic for cart push and update duplicates
