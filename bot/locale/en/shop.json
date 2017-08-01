@@ -1,0 +1,5 @@
+{
+    "default_user_name": "User",
+    "provide_delivery_address": "Please enter the delivery address for these Shoes, starting with city or locality.",
+    "confirm_choice": "Great choice \"%s\" , size %s ! Delivery on %s"
+}

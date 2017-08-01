@@ -1,0 +1,7 @@
+{
+	"ask_recipient_size" : "What size would you like (8 to 12)?",
+    "invalid_size":"Sorry that size is unavailable. Enter a size between 8 and 12.",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "choose_delivery_date": "When would you like it delivered?"
+}
