@@ -28,9 +28,6 @@ lib.dialog('/', [
         session.message.text=null;
 
         session.beginDialog('search:prompt1');
-
-        
-        
     },
 
     function(session, args, next)
@@ -41,7 +38,19 @@ lib.dialog('/', [
         }
         else
         {
+            session.replaceDialog('/');
+        }
+    },
+    function (session, args, next)
+    {
+
+        if (args.response==="Shop More")
+        {
             session.beginDialog('/');
+        }
+        else
+        {
+            next();
         }
     },
 
@@ -70,8 +79,7 @@ lib.dialog('/', [
         // Retrieve deliveryDate, continue to details
         session.dialogData.deliveryDate = args.deliveryDate;
         session.dialogData.recipientSize = args.recipientSize;
-        console.log(session.dialogData);
-        session.send('confirm_choice', session.dialogData.selection.name, session.dialogData.recipientSize, session.dialogData.deliveryDate.toLocaleDateString());
+        // session.send('confirm_choice', session.dialogData.selection.name, session.dialogData.recipientSize, session.dialogData.deliveryDate.toLocaleDateString());
         session.beginDialog('details:/');
     },
     function (session, args) {
@@ -96,7 +104,6 @@ lib.dialog('/', [
             billingAddress: session.dialogData.billingAddress
         };
 
-        console.log('order', order);
         session.beginDialog('checkout:/', { order: order });
     }
 ]);

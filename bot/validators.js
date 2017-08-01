@@ -36,19 +36,19 @@ function basicPrompterWithRegex(regex) {
 function basicPrompterWithExpressionSize(expression) {
     return new builder.IntentDialog()
         .onBegin(function (session, args) {
-            console.log(session);
+            // console.log(session);
             
             session.dialogData.retryPrompt = args.retryPrompt;
             session.send(args.prompt);
         }).onDefault(function (session) {
             var input = session.message.text;
-            xhr.open("GET", model+input, false);
-            xhr.send(xhr.responseText);
-            console.log("ffffiu");
-            console.log(xhr.responseText)
-            var json = JSON.parse(xhr.responseText);
-            input=json["entities"][0]["entity"];
-            console.log(input);
+            // xhr.open("GET", model+input, false);
+            // xhr.send(xhr.responseText);
+            // console.log("ffffiu");
+            // console.log(xhr.responseText)
+            // var json = JSON.parse(xhr.responseText);
+            // input=json["entities"][0]["entity"];
+            // console.log(input);
             if (expression(input)) {
                 session.endDialogWithResult({ response: input });
             } else {

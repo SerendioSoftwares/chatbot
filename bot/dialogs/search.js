@@ -12,33 +12,78 @@ lib.dialog('/', [
 
     function(session, args, next){
         
-        builder.Prompts.text(session, "What would you like?");
+        var cards = getCardsAttachments(session);
+
+        var reply = new builder.Message(session)
+        .attachmentLayout(builder.AttachmentLayout.carousel)
+        .attachments(cards);
+
+        session.send(reply);
+        next();     
+
+        
         
         
     },
+    function (session,args)
+    {
+        builder.Prompts.text(session, "What would you like?");
+    },
+        // Category selected
+    function (session, args, next) {
+       
+        // session.send('choose_bouquet_from_category', category);
+        session.dialogData.category = session.message.text;
+        session.message.text = null;            // remove message so next step does not take it as input
+        session.send("What size are you?")
+        next();
+    },
     function (session) {
-    	session.dialogData.search=session.message.text;
+        var welcomeCard = new builder.HeroCard(session)
+        .buttons([
+            builder.CardAction.imBack(session, "8", "8"),
+            builder.CardAction.imBack(session, "9", "9"),
+            builder.CardAction.imBack(session, "10", "10"),
+            builder.CardAction.imBack(session, "11", "11"),
+            builder.CardAction.imBack(session, "12", "12"),
+        ]);
         session.beginDialog('validators:size', {
-            prompt: session.gettext('What size would you like?'),
+            prompt: session.send(new builder.Message(session)
+        .addAttachment(welcomeCard)),
             retryPrompt: session.gettext('Choose one between 8 and 12')
         });
+        
+    },
+    function (session, args, next) {
+        session.dialogData.recipientSize=args.response;
+        console.log("------------")
+        console.log(session.userData.category)
+        // Retrieve address, continue to shop
+
+        // xhr.open("GET", model+session.dialogData.search, false);
+        // xhr.send(xhr.responseText);
+        // console.log(xhr.responseText)
+        // var json = JSON.parse(xhr.responseText);
+        // input=json["entities"][0]["entity"];
+        // session.message.text=input;
+        // var search = builder;
+
+        
     },
     function (session, args, next) {
     	session.dialogData.recipientSize=args.response;
+        
         // Retrieve address, continue to shop
 
-        xhr.open("GET", model+session.dialogData.search, false);
-        xhr.send(xhr.responseText);
-        console.log(xhr.responseText)
-        var json = JSON.parse(xhr.responseText);
-        input=json["entities"][0]["entity"];
-        session.message.text=input;
-        var search = builder;
-        // console.log("result");
-        // console.log(search);
-        // search = args.response;
-        session.message.search=search;
-        session.beginDialog('product-selection:/', {size : session.dialogData.recipientSize});
+        // xhr.open("GET", model+session.dialogData.search, false);
+        // xhr.send(xhr.responseText);
+        // console.log(xhr.responseText)
+        // var json = JSON.parse(xhr.responseText);
+        // input=json["entities"][0]["entity"];
+        // session.message.text=input;
+        // var search = builder;
+
+        session.beginDialog('product-selection:/', {category: session.dialogData.category, size : session.dialogData.recipientSize});
     },
     function (session, args, next) {
         // Logic for cart push and update duplicates
@@ -91,6 +136,32 @@ lib.dialog('prompt1',
 	}
 
 );
+
+
+
+function getCardsAttachments(session) {
+    output=[];
+
+    categories=[
+    {title:"Formal", imageUrl:"https://img2.cgtrader.com/items/14184/83c0a31caa/formal-shoes-3d-model-max-obj-3ds-c4d.jpg"}, 
+    {title:"Sports", imageUrl:"http://ecx.images-amazon.com/images/I/71jEqzTCmlL._UL1500_.jpg"}];
+    for (i in categories)
+    {
+        product=categories[i];
+        card=new builder.HeroCard(session)
+        // .title(product.title)
+        // .subtitle("Price: "+product.price + "," + "Size: "+product.size)
+        // .text("Quantity: "+product.qty)
+        .images([builder.CardImage.create(session, product.imageUrl)])
+        .buttons([
+            builder.CardAction.imBack(session, product.title + " Shoes", product.title + " Shoes")]);
+        output.push(card);
+    }
+    return output;
+
+}
+
+
 module.exports.createLibrary = function () {
     return lib.clone();
 };

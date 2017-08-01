@@ -25,7 +25,8 @@ lib.dialog('/',
         // First message
         function (session, args, next) {
             // builder.Prompts.text(session, 'What would you like?');
-            // console.log(args);
+            console.log(args);
+            session.dialogData.category=args.category;
             session.dialogData.size=args.size;
             next();
             // session.beginDialog('intelligence:search', {
@@ -37,14 +38,13 @@ lib.dialog('/',
         // Show Categories
         // CarouselPagination.create(products.getCategories, products.getCategory, categoryMapping, carouselOptions),
         // Category selected
+
+
         function (session, args, next) {
-            console.log('====fewf====');
-            console.log(session.message.text);
 
 
-            var category = session.message.text;
-            session.send('choose_bouquet_from_category', category);
-            session.dialogData.category = category;
+            session.send('choose_bouquet_from_category', session.dialogData.category);
+            // session.dialogData.category = category;
             session.message.text = null;            // remove message so next step does not take it as input
             next();
         },
@@ -52,8 +52,9 @@ lib.dialog('/',
         function (session, args, next) {
 
             var categoryName = session.dialogData.category;
+            var size= session.dialogData.category;
             CarouselPagination.create(
-                function (pageNumber, pageSize) { return products.getProducts(categoryName, pageNumber, pageSize); },
+                function (pageNumber, pageSize) { return products.getProducts(categoryName, size, pageNumber, pageSize); },
                 products.getProduct,
                 productMapping,
                 carouselOptions

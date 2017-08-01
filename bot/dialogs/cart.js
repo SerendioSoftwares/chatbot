@@ -12,51 +12,99 @@ lib.dialog('/', [
         var reply = new builder.Message(session)
         .attachmentLayout(builder.AttachmentLayout.carousel)
         .attachments(cards);
+        if (cards.length===0)
+        {   
 
-        session.send(reply);
+             session.send("Looks like your cart is empty!");
+            
+        }
+        else{
+            console.log(cards);
+           session.send(reply);
+        }
         next();
     },
-    function (session, args) {
-        builder.Prompts.text(session, 'ask_recipient_last_name');
+    function (session, args, next) {
+
+        var welcomeCard = new builder.HeroCard(session)
+        .buttons([
+            builder.CardAction.imBack(session, "Shop More", "Shop More"),
+            builder.CardAction.imBack(session, "Checkout", "Checkout")
+        ]);
+        session.send(new builder.Message(session)
+        .addAttachment(welcomeCard));
+        next();     
     },
-    function (session, args) {
-        session.dialogData.recipientLastName = args.response;
-        session.beginDialog('validators:phonenumber', {
-            prompt: session.gettext('ask_recipient_phone_number'),
-            retryPrompt: session.gettext('invalid_phone_number')
-        });
+    function (session, args)
+    {
+        builder.Prompts.text(session, 'Would you like to Modify Cart,  Checkout, or Shop More? \n\n Click the respective buttons to continue.');
+
     },
-    function (session, args) {
-        session.dialogData.recipientPhoneNumber = args.response;
-        session.beginDialog('validators:notes', {
-            prompt: session.gettext('ask_note'),
-            retryPrompt: session.gettext('invalid_note')
-        });
+    function (session, args, next) {
+        response = args.response;
+
+
+        
+        if (response==='Checkout')
+        {
+            session.endDialog();
+        }
+        else if(response==='Shop More') 
+        {
+            session.endDialogWithResult(args);  
+        }
+        else 
+        {
+            temp=response.split(' ');
+            // response=JSON.parse(response);
+            console.log(temp);
+            console.log(temp[0]);
+            session.dialogData.action=temp[0];
+            session.dialogData.id=temp[1];
+
+
+            session.dialogData.response=response;
+            if (session.dialogData.action==="Delete")
+            {
+                session.userData.products.splice(session.dialogData.id,1);
+                session.replaceDialog('/');
+            }
+            else if (session.dialogData.action==="Edit") {
+                next();
+            }
+
+            
+
+            
+        }
+        
     },
-    function (session, args) {
-        session.dialogData.note = args.response;
-        session.beginDialog('sender');
+    function(session, args)
+    {
+        builder.Prompts.number(session, "How many would you like?");
     },
-    function (session, args) {
-        session.dialogData.sender = args.sender;
-        var details = {
-            recipient: {
-                firstName: session.dialogData.recipientFirstName,
-                lastName: session.dialogData.recipientLastName,
-                phoneNumber: session.dialogData.recipientPhoneNumber
-            },
-            note: session.dialogData.note,
-            sender: session.dialogData.sender
-        };
-        session.endDialogWithResult({ details: details });
+    function(session, args)
+    {
+        session.userData.products[session.dialogData.id].qty=args.response;
+        session.replaceDialog('/'); 
     }
+
+    
 ]);
 
-// Sender details
-var UseSavedInfoChoices = {
-    Yes: 'yes',
-    No: 'edit'
-};
+lib.dialog('quantity', [
+    function (session)
+    {
+        builder.Prompts.number(session, "How many would you like?")
+    },
+    function (session, args)
+    {
+        response=args.response;
+        console.log(args);
+        session.endDialogWithResult(args)
+    }
+    ]);
+
 
 function getCardsAttachments(session) {
     output=[];
@@ -66,61 +114,16 @@ function getCardsAttachments(session) {
         product=session.userData.products[i];
         card=new builder.HeroCard(session)
         .title(product.name)
-        .subtitle("Price: "+product.price + "\n\n" + "Size: "+product.size)
+        .subtitle("Price: "+product.price + "," + "Size: "+product.size)
         .text("Quantity: "+product.qty)
-        .images([botbuilder.CardImage.create(session, product.imageUrl)])
+        .images([builder.CardImage.create(session, product.imageUrl)])
         .buttons([
-            builder.CardAction.imBack(session, {id:i, action:'edit'}, 'Edit Quantity'),
-            builder.CardAction.imBack(session, {id:i, action:'delete'}, "Delete")]);
+            builder.CardAction.imBack(session, 'Edit '+i+ ' . ' + product.name, 'Edit Quantity'),
+            builder.CardAction.imBack(session, 'Delete '+i+ ' . '+ product.name, 'Delete')]);
         output.push(card);
     }
     return output;
 
-    return [
-        new builder.HeroCard(session)
-            .title('Azure Storage')
-            .subtitle('Offload the heavy lifting of data center management')
-            .text('Store and help protect your data. Get durable, highly available data storage across the globe and pay only for what you use.')
-            .images([
-                builder.CardImage.create(session, 'https://docs.microsoft.com/en-us/azure/storage/media/storage-introduction/storage-concepts.png')
-            ])
-            .buttons([
-                builder.CardAction.openUrl(session, 'https://azure.microsoft.com/en-us/services/storage/', 'Learn More')
-            ]),
-
-        new builder.ThumbnailCard(session)
-            .title('DocumentDB')
-            .subtitle('Blazing fast, planet-scale NoSQL')
-            .text('NoSQL service for highly available, globally distributed apps—take full advantage of SQL and JavaScript over document and key-value data without the hassles of on-premises or virtual machine-based cloud database options.')
-            .images([
-                builder.CardImage.create(session, 'https://docs.microsoft.com/en-us/azure/documentdb/media/documentdb-introduction/json-database-resources1.png')
-            ])
-            .buttons([
-                builder.CardAction.openUrl(session, 'https://azure.microsoft.com/en-us/services/documentdb/', 'Learn More')
-            ]),
-
-        new builder.HeroCard(session)
-            .title('Azure Functions')
-            .subtitle('Process events with a serverless code architecture')
-            .text('An event-based serverless compute experience to accelerate your development. It can scale based on demand and you pay only for the resources you consume.')
-            .images([
-                builder.CardImage.create(session, 'https://azurecomcdn.azureedge.net/cvt-5daae9212bb433ad0510fbfbff44121ac7c759adc284d7a43d60dbbf2358a07a/images/page/services/functions/01-develop.png')
-            ])
-            .buttons([
-                builder.CardAction.openUrl(session, 'https://azure.microsoft.com/en-us/services/functions/', 'Learn More')
-            ]),
-
-        new builder.ThumbnailCard(session)
-            .title('Cognitive Services')
-            .subtitle('Build powerful intelligence into your applications to enable natural and contextual interactions')
-            .text('Enable natural and contextual interaction with tools that augment users\' experiences using the power of machine-based intelligence. Tap into an ever-growing collection of powerful artificial intelligence algorithms for vision, speech, language, and knowledge.')
-            .images([
-                builder.CardImage.create(session, 'https://azurecomcdn.azureedge.net/cvt-68b530dac63f0ccae8466a2610289af04bdc67ee0bfbc2d5e526b8efd10af05a/images/page/services/cognitive-services/cognitive-services.png')
-            ])
-            .buttons([
-                builder.CardAction.openUrl(session, 'https://azure.microsoft.com/en-us/services/cognitive-services/', 'Learn More')
-            ])
-    ];
 }
 
 
