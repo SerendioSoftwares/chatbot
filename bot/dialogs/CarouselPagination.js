@@ -51,11 +51,19 @@ module.exports = {
         return function (session, args, next) {
             var pageNumber = session.dialogData.pageNumber || 1;
             var input = session.message.text;
+            console.log('KKKK-----KKKK');
+            console.log(input);
             var selectPrefix = session.gettext(settings.selectTemplate);
             if (input && input.toLowerCase() === session.gettext(settings.showMoreValue).toLowerCase()) {
                 // next page
                 pageNumber++;
-            } else if (input && isSelection(input, selectPrefix)) {
+            }
+            else if(input==='Change Category' || input==='Change Size' || input==='Change Price Range')
+            {
+                return next({selected:input})
+            } 
+
+            else if (input && isSelection(input, selectPrefix)) {
                 // Validate selection
                 var selectedName = input.substring(selectPrefix.length);
                 getItemFunc(selectedName).then(function (selectedItem) {
@@ -69,6 +77,7 @@ module.exports = {
                     // return selection to dialog stack
                     return next({ selected: selectedItem });
                 });
+
 
                 return;
             }
@@ -90,9 +99,26 @@ module.exports = {
                 // more items link
                 if (pageResult.totalCount > pageNumber * settings.pageSize) {
                     var moreCard = new builder.HeroCard(session)
-                        .title(settings.showMoreTitle)
+                        // .title(settings.showMoreTitle)
                         .buttons([
-                            builder.CardAction.imBack(session, session.gettext(settings.showMoreValue), settings.showMoreValue)
+                            builder.CardAction.imBack(session, session.gettext(settings.showMoreValue), settings.showMoreValue),
+                            builder.CardAction.imBack(session, 'Change Filters' , 'Change Filters'),
+                            // builder.CardAction.imBack(session, 'Change Category' , 'Change Category'),
+                            // builder.CardAction.imBack(session, 'Change Size' , 'Change Size'),
+                            // builder.CardAction.imBack(session, 'Change Price Range' , 'Change Price Range')
+
+                        ]);
+                    session.send(new builder.Message(session).addAttachment(moreCard));
+                }
+                else
+                {
+                     var moreCard = new builder.HeroCard(session)
+                        // .title(settings.showMoreTitle)
+                        .buttons([
+                            builder.CardAction.imBack(session, 'Change Filters' , 'Change Filters'),                            // builder.CardAction.imBack(session, 'Change Category' , 'Change Category'),
+                            // builder.CardAction.imBack(session, 'Change Size' , 'Change Size'),
+                            // builder.CardAction.imBack(session, 'Change Price Range' , 'Change Price Range')
+
                         ]);
                     session.send(new builder.Message(session).addAttachment(moreCard));
                 }

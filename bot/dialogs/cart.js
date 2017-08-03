@@ -6,40 +6,37 @@ var lib = new builder.Library('cart');
 
 lib.dialog('/', [
     function (session, args, next) {
-        var cards = getCardsAttachments(session);
-
-    // create reply with Carousel AttachmentLayout
-        var reply = new builder.Message(session)
-        .attachmentLayout(builder.AttachmentLayout.carousel)
-        .attachments(cards);
-        if (cards.length===0)
+        console.log(session.userData)        
+        if (session.userData.products.length===0)
         {   
-
              session.send("Looks like your cart is empty!");
-            
-        }
+              var welcomeCard = new builder.HeroCard(session)
+                .buttons([
+                    builder.CardAction.imBack(session, "Shop More", "Shop More"),
+                ]);
+                session.send(new builder.Message(session)
+                .addAttachment(welcomeCard));
+                }
         else{
-            console.log(cards);
-           session.send(reply);
-        }
+            session.send(new builder.Message(session).addAttachment(createReceiptCard(session)));
+            
+            var welcomeCard = new builder.HeroCard(session)
+            .buttons([
+                builder.CardAction.imBack(session, "Shop More", "Shop More"),
+                builder.CardAction.imBack(session, "Checkout", "Checkout")
+            ]);
+            session.send(new builder.Message(session)
+            .addAttachment(welcomeCard));
+            }
         next();
     },
-    function (session, args, next) {
 
-        var welcomeCard = new builder.HeroCard(session)
-        .buttons([
-            builder.CardAction.imBack(session, "Shop More", "Shop More"),
-            builder.CardAction.imBack(session, "Checkout", "Checkout")
-        ]);
-        session.send(new builder.Message(session)
-        .addAttachment(welcomeCard));
-        next();     
-    },
     function (session, args)
     {
         builder.Prompts.text(session, 'Would you like to Modify Cart,  Checkout, or Shop More? \n\n Click the respective buttons to continue.');
 
     },
+    
     function (session, args, next) {
         response = args.response;
 
@@ -52,6 +49,54 @@ lib.dialog('/', [
         else if(response==='Shop More') 
         {
             session.endDialogWithResult(args);  
+        }
+        else if(response==='Modify Cart')
+        {
+            session.beginDialog('modify');
+            
+        }
+        
+    },
+    function (session, args, next)
+    {
+        session.replaceDialog('/');
+    }
+
+
+    
+]);
+
+
+lib.dialog('modify',[
+    function(session, args, next)
+    {
+        var cards = getCardsAttachments(session);
+
+    // create reply with Carousel AttachmentLayout
+        var reply = new builder.Message(session)
+        .attachmentLayout(builder.AttachmentLayout.carousel)
+        .attachments(cards);
+
+        session.send(reply);
+
+        var welcomeCard = new builder.Message(session).addAttachment(new builder.HeroCard(session)
+        .buttons([
+            builder.CardAction.imBack(session, "Done", "Done")
+        ]));
+
+        session.beginDialog('validators:modify', {
+            prompt: session.send(welcomeCard),
+            retryPrompt: session.gettext('Invalid input, please select a button to continue.')
+        });
+
+
+    },
+    function(session, args, next)
+    {
+        response=args.response;
+        if(response==='Done') 
+        {
+            session.endDialog();  
         }
         else 
         {
@@ -67,17 +112,13 @@ lib.dialog('/', [
             if (session.dialogData.action==="Delete")
             {
                 session.userData.products.splice(session.dialogData.id,1);
-                session.replaceDialog('/');
+                session.replaceDialog('modify');
             }
             else if (session.dialogData.action==="Edit") {
                 next();
             }
-
-            
-
             
         }
-        
     },
     function(session, args)
     {
@@ -89,10 +130,9 @@ lib.dialog('/', [
     function(session, args)
     {
         session.userData.products[session.dialogData.id].qty=args.response;
-        session.replaceDialog('/'); 
+        session.replaceDialog('modify');
     }
 
-    
 ]);
 
 lib.dialog('quantity', [
@@ -103,10 +143,14 @@ lib.dialog('quantity', [
     function (session, args)
     {
         response=args.response;
-        console.log(args);
-        session.endDialogWithResult(args)
-    }
-    ]);
+        session.endDialogWithResult(args);
+    },
+    function (session, args)
+    {
+
+    },
+
+]);
 
 
 function getCardsAttachments(session) {
@@ -127,6 +171,34 @@ function getCardsAttachments(session) {
     }
     return output;
 
+}
+
+function createReceiptCard(session) {
+    console.log("Building Recipt Cart")
+    output=[];
+    total=0;
+    for (i in session.userData.products)
+    {
+        product=session.userData.products[i];
+        card=builder.ReceiptItem.create(session, product.price, product.name +' ('+product.qty+')')
+            .image(builder.CardImage.create(session, product.imageUrl));
+        output.push(card);
+        total+=product.price*product.qty;
+
+    }
+    session.userData.total=total;//for checkout
+    return new builder.ReceiptCard(session)
+        .title('John Doe')
+        .facts([
+            builder.Fact.create(session, '1234', 'Order Number'),
+            builder.Fact.create(session, 'VISA 5555-****', 'Payment Method')
+        ])
+        .items(output)
+        .tax('$ 0')
+        .total('$ '+total.toFixed(2))
+        .buttons([
+            builder.CardAction.imBack(session,'Modify Cart', 'Modify Cart')
+        ]);
 }
 
 

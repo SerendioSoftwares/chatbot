@@ -1,20 +1,43 @@
 extends ../layout
 
 block content
+  p
+    label(style='font-size: 24px') OrderId:&nbsp;
+    |#{order.id}
+    <br>
+    <br>
+
+  fieldset
+    legend User details
+    p
+      label(for="username") User Name:
+        input(type="text", name="username")
+    p
+      label(for="emailid") Email Id:
+        input(type="text", name="EmailId")
+    p
+      label(for="phone") Phone number:
+        input(type="text", name="phone")
+    p
+      label(for="address") Address:
+        textarea(name:'body', rows:20)
+    p
+      <br>
+      label(for="landmark") Landmark:
+        input(type="text", name="address")
+  <br><br>
+
   form(method="post")
     fieldset
       legend Checkout &amp; Payment
 
       p
         strong
-          | Total Price: $ #{order.selection.price}
+          | Total Price: $
 
       p
         label(for="creditcard") Credit card number:
           input(type="text", name="creditcard", placeholder="Any number will do")
-      p
-        label(for="fullname") Full name:
-          input(type="text", name="fullname", placeholder="Your full name")
 
       div
         input(type="hidden", name="orderId", value=order.id)

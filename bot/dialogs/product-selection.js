@@ -29,10 +29,7 @@ lib.dialog('/',
             session.dialogData.category=args.category;
             session.dialogData.size=args.size;
             next();
-            // session.beginDialog('intelligence:search', {
-            //     prompt: session.gettext('What would you like'),
-            //     retryPrompt: session.gettext('Only shoes, sandals and slippers are available')
-            //     });
+
             
         },
         // Show Categories
@@ -65,11 +62,17 @@ lib.dialog('/',
         function (session, args, next) {
             console.log('Selected-----------------------');
             console.log(args.selected);
-            args.selected.qty=1;
-            args.selected.size=session.dialogData.size;
-            // this is last step, calling next with args will end in session.endDialogWithResult(args)
-            next({ selection: args.selected });
-            
+            if(args.selected==='Change Size')
+            {
+               next({ selection: args.selected });
+            }
+            else
+            {
+                args.selected.qty=1;
+                args.selected.size=session.dialogData.size;
+                // this is last step, calling next with args will end in session.endDialogWithResult(args)
+                next({ selection: args.selected });
+            }
         }
     ]));
 

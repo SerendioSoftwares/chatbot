@@ -29,6 +29,10 @@ lib.dialog('category', basicPrompterWithExpression(function (input) {
     return (input==="Formal Shoes" || input==="Sports Shoes");
 }));
 
+lib.dialog('modify', basicPrompterWithExpression(function (input) {
+    return (input==="Done" || input.split(' ')[0]==="Edit"|| input.split(' ')[0]==="Delete");
+}));
+
 lib.dialog('phonenumber', basicPrompterWithRegex(PhoneRegex));
 
 lib.dialog('email', basicPrompterWithRegex(EmailRegex));

@@ -23,10 +23,8 @@ lib.dialog('/', [
 
     function (session, args, next) 
     {
-        // Ask for delivery address using 'address' library
         console.log('------=====FK');
         session.message.text=null;
-
         session.beginDialog('search:prompt1');
     },
 

@@ -1,22 +1,27 @@
 body {
   padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-color: #9098ff;
 }
 
 a {
   color: #00B7FF;
 }
 
-fieldset {
-  border: 1px solid #ccc
-}
-
 fieldset label {
   display: block;
-  width: 400px;
+  width: 600px;
   clear: both;
 }
 
 fieldset label input {
   float: right;
+  width: 300px;
+}
+fieldset label textarea {
+  float: right;
+  width: 300px;
+}
+
+order {
+  font-size: 20px;
 }

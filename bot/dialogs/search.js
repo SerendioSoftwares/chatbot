@@ -11,91 +11,72 @@ var lib = new builder.Library('search');
 lib.dialog('/', [
 
     function(session, args, next){
-        
-        var cards = getCardsAttachments(session);
-
-        var reply = new builder.Message(session)
-        .attachmentLayout(builder.AttachmentLayout.carousel)
-        .attachments(cards);
-
-
-        session.beginDialog('validators:category', {
-            prompt: session.send(reply),
-            retryPrompt: session.gettext('Choose one from the given categories')
-        });
-        next();     
-
-        
-        
-        
+        console.log(session.dialogData);
+        if (!session.dialogData.category)
+        {
+            session.beginDialog('category');
+            
+        }
+        next();
     },
     
         // Category selected
     function (session, args, next) {
+        if (!session.dialogData.category)
+        {
+            session.dialogData.category=args.response;
+        }
        
         // session.send('choose_bouquet_from_category', category);
-        session.dialogData.category = session.message.text;
-        session.message.text = null;            // remove message so next step does not take it as input
-        session.send("What size are you?")
+        if(!session.dialogData.size)
+        {
+            session.beginDialog('size');
+        }
         next();
     },
-    function (session) {
-        var welcomeCard = new builder.HeroCard(session)
-        .buttons([
-            builder.CardAction.imBack(session, "8", "8"),
-            builder.CardAction.imBack(session, "9", "9"),
-            builder.CardAction.imBack(session, "10", "10"),
-            builder.CardAction.imBack(session, "11", "11"),
-            builder.CardAction.imBack(session, "12", "12"),
-        ]);
-        session.beginDialog('validators:size', {
-            prompt: session.send(new builder.Message(session)
-        .addAttachment(welcomeCard)),
-            retryPrompt: session.gettext('Choose one between 8 and 12')
-        });
-        
-    },
     function (session, args, next) {
-        session.dialogData.recipientSize=args.response;
-        console.log("------------")
-        console.log(session.userData.category)
+       
+        if(!session.dialogData.size)
+        {
+            session.dialogData.size=args.response;
+        }
+        if(!session.dialogData.price)
+        {
+            session.beginDialog('price');
+        }
+        next();
+    },
 
-        session.send("What Price range are you in for?");
-        var welcomeCard = new builder.HeroCard(session)
-        .buttons([
-            builder.CardAction.imBack(session, "40", "Less than $40"),
-            builder.CardAction.imBack(session, "60", "$40-$60"),
-            builder.CardAction.imBack(session, "80", "$60-$80"),
-            builder.CardAction.imBack(session, "80", "Above $80"),
-        ]);
-        session.beginDialog('validators:price', {
-            prompt: session.send(new builder.Message(session)
-        .addAttachment(welcomeCard)),
-            retryPrompt: session.gettext('Choose one from the given options')
-        });
-        
 
-        
+    function (session, args, next) {
+
+
+        if(!session.dialogData.price)
+        {
+            session.dialogData.price=args.response;
+        }
+
+        next();
 
         
     },
     function (session, args, next) {
     	session.dialogData.priceRange=args.response;
 
-        // Retrieve address, continue to shop
 
-        // xhr.open("GET", model+session.dialogData.search, false);
-        // xhr.send(xhr.responseText);
-        // console.log(xhr.responseText)
-        // var json = JSON.parse(xhr.responseText);
-        // input=json["entities"][0]["entity"];
-        // session.message.text=input;
-        // var search = builder;
 
-        session.beginDialog('product-selection:/', {category: session.dialogData.category, size : session.dialogData.recipientSize, price : session.dialogData.priceRange});
+        session.beginDialog('product-selection:/', {category: session.dialogData.category, size : session.dialogData.size, price : session.dialogData.price});
     },
     function (session, args, next) {
         // Logic for cart push and update duplicates
+
+        console.log(args);
+        if(args.selection==='Change Category' || args.selection==='Change Size' || args.selection==='Change Price Range')
+        {
+            console.log('WOrks');
+            session.beginDialog('/' ,{category: session.dialogData.category, size : session.dialogData.size, price : session.dialogData.price});
+        }
+
         console.log('-----');
         flag=false;
         temp=null;
@@ -146,7 +127,78 @@ lib.dialog('prompt1',
 
 );
 
+lib.dialog('category',[
+    function(session, args, next)
+    {   
+        var cards = getCardsAttachments(session);
+        var reply = new builder.Message(session)
+        .attachmentLayout(builder.AttachmentLayout.carousel)
+        .attachments(cards);
 
+
+        session.beginDialog('validators:category', {
+            prompt: session.send(reply),
+            retryPrompt: session.gettext('Choose one from the given categories')
+        });
+    },
+    function (session, args)
+    {
+        session.endDialogWithResult(args);
+    }
+
+    ]);
+
+lib.dialog('size',[
+    function(session, args, next)
+    {   
+        session.send("What size are you?");
+        var welcomeCard = new builder.HeroCard(session)
+        .buttons([
+            builder.CardAction.imBack(session, "8", "8"),
+            builder.CardAction.imBack(session, "9", "9"),
+            builder.CardAction.imBack(session, "10", "10"),
+            builder.CardAction.imBack(session, "11", "11"),
+            builder.CardAction.imBack(session, "12", "12"),
+        ]);
+        session.beginDialog('validators:size', {
+            prompt: session.send(new builder.Message(session).addAttachment(welcomeCard)),
+            retryPrompt: session.gettext('Choose one between 8 and 12')
+        });
+        next();     
+    },
+    function (session, args)
+    {
+        session.endDialogWithResult(args);
+    }
+
+    ]);
+
+lib.dialog('price',[
+    function(session, args, next)
+    {  
+        session.send("What Price range are you in for?");
+        var welcomeCard = new builder.HeroCard(session)
+        .buttons([
+            builder.CardAction.imBack(session, "40", "Less than $40"),
+            builder.CardAction.imBack(session, "60", "$40-$60"),
+            builder.CardAction.imBack(session, "80", "$60-$80"),
+            builder.CardAction.imBack(session, "80", "Above $80"),
+        ]);
+        session.beginDialog('validators:price', {
+            prompt: session.send(new builder.Message(session)
+        .addAttachment(welcomeCard)),
+            retryPrompt: session.gettext('Choose one from the given options')
+        });
+
+        
+        next();     
+    },
+    function (session, args)
+    {
+        session.endDialogWithResult(args);
+    }
+
+    ]);
 
 function getCardsAttachments(session) {
     output=[];

@@ -34,7 +34,7 @@ lib.dialog('/', [
                 encodeURIComponent(order.id),
                 encodeURIComponent(addressSerialized));
 
-            var messageText = session.gettext('final_price', order.selection.price);
+            var messageText = session.gettext('final_price', session.userData.total);
             var card = new builder.HeroCard(session)
                 .text(messageText)
                 .buttons([
