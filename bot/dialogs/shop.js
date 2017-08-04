@@ -14,7 +14,7 @@ lib.dialog('/', [
 
 
     function(session, args, next){
-        
+        session.message.text=null;
        session.beginDialog('search:/');
         
         
@@ -23,9 +23,36 @@ lib.dialog('/', [
 
     function (session, args, next) 
     {
-        console.log('------=====FK');
-        session.message.text=null;
-        session.beginDialog('search:prompt1');
+        if(args.selection==='Change Filters')
+        {
+            session.beginDialog('/');
+        }
+        else
+        {
+            console.log('------=====FK');
+            session.message.text=null;
+            // session.beginDialog('prompt1');  
+            console.log('------=====FK1');
+            var welcomeCard = new builder.Message(session)
+            .addAttachment(new builder.HeroCard(session)
+            .buttons([
+                builder.CardAction.imBack(session, "Shop More", "Shop More"),
+                builder.CardAction.imBack(session, "Cart", "Cart")
+            ]));
+
+            // if (session.message.text)
+            // {
+            //     session.endDialog();
+            // }
+            // else{
+            session.beginDialog('validators:cart', {
+                prompt: session.send(welcomeCard),
+                retryPrompt: session.gettext('Choose from the given options')
+            });
+            
+            // }  
+        }
+        
     },
 
     function(session, args, next)
@@ -36,7 +63,7 @@ lib.dialog('/', [
         }
         else
         {
-            session.replaceDialog('/');
+            session.beginDialog('/');
         }
     },
     function (session, args, next)
@@ -62,49 +89,64 @@ lib.dialog('/', [
     },
 
 
+
     // function (session, args) {
-    //     // Retrieve address, continue to shop
-    //     session.dialogData.recipientAddress = args.address;
-    //     session.beginDialog('product-selection:/');
+    //     // Retrieve deliveryDate, continue to details
+    //     session.dialogData.deliveryDate = args.deliveryDate;
+    //     session.dialogData.recipientSize = args.recipientSize;
+    //     // session.send('confirm_choice', session.dialogData.selection.name, session.dialogData.recipientSize, session.dialogData.deliveryDate.toLocaleDateString());
+    //     session.beginDialog('details:/');
+    // },
+    // function (session, args) {
+    //     // Retrieve details, continue to billing address
+    //     session.dialogData.details = args.details;
+    //     session.beginDialog('address:billing');
+    // },
+    // function (session, args, next) {
+    //     // Retrieve billing address
+    //     session.dialogData.billingAddress = args.billingAddress;
+    //     next();
     // },
     function (session, args) {
-        // Retrieve selection, continue to delivery date
-        console.log('===========================================================================');
-        session.dialogData.selection = args.selection;
-        session.beginDialog('delivery:date');
-    },
-    function (session, args) {
-        // Retrieve deliveryDate, continue to details
-        session.dialogData.deliveryDate = args.deliveryDate;
-        session.dialogData.recipientSize = args.recipientSize;
-        // session.send('confirm_choice', session.dialogData.selection.name, session.dialogData.recipientSize, session.dialogData.deliveryDate.toLocaleDateString());
-        session.beginDialog('details:/');
-    },
-    function (session, args) {
-        // Retrieve details, continue to billing address
-        session.dialogData.details = args.details;
-        session.beginDialog('address:billing');
-    },
-    function (session, args, next) {
-        // Retrieve billing address
-        session.dialogData.billingAddress = args.billingAddress;
-        next();
-    },
-    function (session, args) {
         // Continue to checkout
+        session.dialogData.recipientAddress = args.address;
         var order = {
-            selection: session.dialogData.selection,
+            products: session.userData.products,
             delivery: {
-                date: session.dialogData.deliveryDate,
+                // date: session.dialogData.deliveryDate,
                 address: session.dialogData.recipientAddress
             },
-            details: session.dialogData.details,
-            billingAddress: session.dialogData.billingAddress
+            total: session.userData.total
+            // details: session.dialogData.details,
+            // billingAddress: session.dialogData.billingAddress
         };
 
-        session.beginDialog('checkout:/', { order: order });
+        session.beginDialog('checkout:/', { order: order});
     }
 ]);
+
+
+lib.dialog('prompt1', 
+    function (session, args, next) {
+                console.log('------=====FK1');
+                var welcomeCard = new builder.HeroCard(session)
+        .buttons([
+            builder.CardAction.imBack(session, "Shop More", "Shop More"),
+            builder.CardAction.imBack(session, "Cart", "Cart")
+        ]);
+
+        // if (session.message.text)
+        // {
+        //     session.endDialog();
+        // }
+        // else{
+        session.send(new builder.Message(session)
+        .addAttachment(welcomeCard));
+        // }
+    }
+
+);
+
 
 // Export createLibrary() function
 module.exports.createLibrary = function () {

@@ -6,28 +6,28 @@ block content
     |#{order.id}
     <br>
     <br>
-
-  fieldset
-    legend User details
-    p
-      label(for="username") User Name:
-        input(type="text", name="username")
-    p
-      label(for="emailid") Email Id:
-        input(type="text", name="EmailId")
-    p
-      label(for="phone") Phone number:
-        input(type="text", name="phone")
-    p
-      label(for="address") Address:
-        textarea(name:'body', rows:20)
-    p
-      <br>
-      label(for="landmark") Landmark:
-        input(type="text", name="address")
-  <br><br>
-
   form(method="post")
+    fieldset
+      legend User details
+      p
+        label(for="username") Name:
+          input(type="text", name="name")
+      p
+        label(for="emailid") Email Id:
+          input(type="text", name="EmailId")
+      p
+        label(for="phone") Phone number:
+          input(type="text", name="phone")
+      p
+        label(for="address") Address:
+          textarea(name:'body', rows:20)=order.delivery.address
+      p
+        <br>
+        label(for="landmark") Landmark:
+          input(type="text", name="landmark")
+    <br><br>
+
+
     fieldset
       legend Checkout &amp; Payment
 
@@ -43,5 +43,5 @@ block content
         input(type="hidden", name="orderId", value=order.id)
         input(type="hidden", name="address", value=address)
 
-      p.buttons
-        input(type="submit", value="Checkout!")
+    p.buttons
+      input(type="submit", value="Checkout!")

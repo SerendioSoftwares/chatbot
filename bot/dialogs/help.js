@@ -4,18 +4,51 @@ var lib = new builder.Library('help');
 lib.dialog('/',[ 
 	function (session)
 	{
-		builder.Prompts.text(session, "Type in your Query to get help. \n\n Alternately type in \"order\" or your Order Id to review past orders.");
+		builder.Prompts.text(session, "Type in your Query to get help. \n\n Alternately type in \"order\" or your Order ID to review past orders.");
 	},
 	function (session, args)
 	{
 
-		// session.dialogData.response=session.message.text;
-		// check_option(session.message.)//verfication
-		// 1:order/ID 
-		// 2:Query
-	},
+		response=session.message.text;
 
 
+		//Check Query/Order
+
+
+		if(true)
+		{
+
+		}
+		else if (true) 
+		{
+			
+		}
+		else
+		{
+			session.send("Sorry, couldn't interpret that.")
+		}
+
+		var welcomeCard = new builder.Message(session).addAttachment(new builder.HeroCard(session)
+        	.buttons([
+            builder.CardAction.imBack(session, "Other Query", "Other Query"),
+            builder.CardAction.imBack(session, "Restart", "Back")
+        ]));
+
+        builder.Prompts.text(session, welcomeCard);	
+    },
+    function (session, args, next)
+    {
+    	console.log('----------------------');
+		if (session.message.text==='Begin Shopping!')
+		{
+			session.endDialog();
+		}
+		else
+		{
+        	session.replaceDialog('/');
+        }
+	}
+	
 ]);
 
 // lib.dialog('query',
@@ -45,24 +78,7 @@ lib.dialog('/',[
 // lib.dialog('reprompt',[
 	
 // 		//ask question or start shopping
-// 	function (session, args, next) {
-// 		console.log('------=====FK1');
-// 		var welcomeCard = new builder.HeroCard(session)
-//         	.buttons([
-//             builder.CardAction.imBack(session, "Other Query", "Other Query"),
-//             builder.CardAction.imBack(session, "Begin Shopping!", "Begin Shopping!")
-//         ]);
-
-// 		if (session.message.text)
-// 		{
-// 			session.endDialog();
-// 		}
-// 		else
-// 		{
-//         session.send(new builder.Message(session)
-//         .addAttachment(welcomeCard));
-//     	}
-// 	}
+	
 // 	]);
 // function check_option(input)
 // {

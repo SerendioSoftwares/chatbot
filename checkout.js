@@ -26,14 +26,14 @@ router.get('/', function (req, res, next) {
 
       // Show completion
       return res.render('checkout/completed', {
-        title: 'Contoso Flowers - Order Processed',
+        title: 'Serendio Shoes - Order Processed',
         order: order
       });
     }
 
     // Payment form
     return res.render('checkout/index', {
-      title: 'Contoso Flowers - Order Checkout',
+      title: 'Serendio Shoes - Order Checkout',
       address: req.query.address,
       order: order
     });
@@ -50,12 +50,13 @@ router.post('/', function (req, res, next) {
   var orderId = req.body.orderId;
   var address = botUtils.deserializeAddress(req.body.address);
   console.log('user address is', address);
-
+  console.log(req.body);
   // Payment information
   var paymentDetails = {
     creditcardNumber: req.body.creditcard,
-    creditcardHolder: req.body.fullname
+    creditcardHolder: req.body.name
   };
+
 
   // Complete order
   orderService.confirmOrder(orderId, paymentDetails).then(function (processedOrder) {
@@ -64,8 +65,15 @@ router.post('/', function (req, res, next) {
     bot.beginDialog(address, 'checkout:completed', { orderId: orderId });
 
     // Show completion
+    console.log('=============================================================');
+    console.log(processedOrder);
+
+    processedOrder.email = req.body.EmailId;
+    processedOrder.name = req.body.name;
+    processedOrder.phone = req.body.phone;
+        
     return res.render('checkout/completed', {
-      title: 'Contoso Flowers - Order processed',
+      title: 'Serendio Shoes - Order processed',
       order: processedOrder
     });
 

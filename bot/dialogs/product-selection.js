@@ -62,9 +62,9 @@ lib.dialog('/',
         function (session, args, next) {
             console.log('Selected-----------------------');
             console.log(args.selected);
-            if(args.selected==='Change Size')
+            if(args.selected==='Change Filters')
             {
-               next({ selection: args.selected });
+                session.endDialog();
             }
             else
             {

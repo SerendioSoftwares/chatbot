@@ -75,7 +75,8 @@ bot.use({
         if (settingsRegex.test(text)) {
             // interrupt and trigger 'settings' dialog 
             return session.beginDialog('settings:/');
-        } else if (supportRegex.test(text)) {
+        } 
+        else if (supportRegex.test(text)) {
             // interrupt and trigger 'help' dialog
             return session.beginDialog('help:/');
         }
@@ -119,7 +120,7 @@ function listen() {
     return function (req, res) {
         // Capture the url for the hosted application
         // We'll later need this url to create the checkout link 
-        var url = "http" + '://' + req.get('host');
+        var url = "https" + '://' + req.get('host');
         siteUrl.save(url);
         connectorListener(req, res);
     };

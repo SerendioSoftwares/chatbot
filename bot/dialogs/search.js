@@ -11,9 +11,11 @@ var lib = new builder.Library('search');
 lib.dialog('/', [
 
     function(session, args, next){
+        console.log('ZZZZZZZZZZZZZZZZZ');
         console.log(session.dialogData);
         if (!session.dialogData.category)
         {
+            console.log('11111111111111111');
             session.beginDialog('category');
             
         }
@@ -71,13 +73,13 @@ lib.dialog('/', [
         // Logic for cart push and update duplicates
 
         console.log(args);
-        if(args.selection==='Change Category' || args.selection==='Change Size' || args.selection==='Change Price Range')
+        if(!args.selection)
         {
             console.log('WOrks');
-            session.beginDialog('/' ,{category: session.dialogData.category, size : session.dialogData.size, price : session.dialogData.price});
+            session.replaceDialog('/');
         }
 
-        console.log('-----');
+        else{
         flag=false;
         temp=null;
         for (i in session.userData.products)
@@ -101,35 +103,18 @@ lib.dialog('/', [
         console.log(session.userData.products);
         session.endDialog();
     }
+    }
 ]);
 
 
 
 
-lib.dialog('prompt1', 
-	function (session, args, next) {
-		        console.log('------=====FK1');
-		        var welcomeCard = new builder.HeroCard(session)
-        .buttons([
-            builder.CardAction.imBack(session, "Shop More", "Shop More"),
-            builder.CardAction.imBack(session, "Cart", "Cart")
-        ]);
 
-		if (session.message.text)
-		{
-			session.endDialog();
-		}
-		else{
-        session.send(new builder.Message(session)
-        .addAttachment(welcomeCard));
-    	}
-	}
-
-);
 
 lib.dialog('category',[
     function(session, args, next)
-    {   
+    {   session.message.text=null;
+        console.log('22222222222222222222222');
         var cards = getCardsAttachments(session);
         var reply = new builder.Message(session)
         .attachmentLayout(builder.AttachmentLayout.carousel)
@@ -143,6 +128,7 @@ lib.dialog('category',[
     },
     function (session, args)
     {
+        console.log('3333333333333333');
         session.endDialogWithResult(args);
     }
 
@@ -164,7 +150,6 @@ lib.dialog('size',[
             prompt: session.send(new builder.Message(session).addAttachment(welcomeCard)),
             retryPrompt: session.gettext('Choose one between 8 and 12')
         });
-        next();     
     },
     function (session, args)
     {

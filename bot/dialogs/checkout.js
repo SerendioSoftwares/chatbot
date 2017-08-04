@@ -34,11 +34,12 @@ lib.dialog('/', [
                 encodeURIComponent(order.id),
                 encodeURIComponent(addressSerialized));
 
-            var messageText = session.gettext('final_price', session.userData.total);
+            var total = order.total.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0]
+            var messageText = session.gettext('final_price', total);
             var card = new builder.HeroCard(session)
                 .text(messageText)
                 .buttons([
-                    builder.CardAction.openUrl(session, checkoutUrl, 'add_credit_card'),
+                    builder.CardAction.openUrl(session, checkoutUrl, 'Enter Information'),
                     builder.CardAction.imBack(session, session.gettext(RestartMessage), RestartMessage)
                 ]);
 
@@ -74,38 +75,71 @@ lib.dialog('completed', function (session, args, next) {
             throw new Error(session.gettext('order_not_found'));
         }
 
-        var messageText = session.gettext(
-            'order_details',
-            order.id,
-            order.selection.name,
-            order.details.recipient.firstName,
-            order.details.recipient.lastName,
-            order.details.note);
 
-        var receiptCard = new builder.ReceiptCard(session)
-            .title(order.paymentDetails.creditcardHolder)
-            .facts([
-                builder.Fact.create(session, order.id, 'order_number'),
-                builder.Fact.create(session, offuscateNumber(order.paymentDetails.creditcardNumber), 'payment_method')
-            ])
-            .items([
-                builder.ReceiptItem.create(session, order.selection.price, order.selection.name)
-                    .image(builder.CardImage.create(session, order.selection.imageUrl))
-            ])
-            .total(order.selection.price)
-            .buttons([
-                builder.CardAction.openUrl(session, 'https://dev.botframework.com/', 'more_information')
-            ]);
+        // var messageText = session.gettext(
+        //     'order_details',
+        //     order.id,
+        //     order.selection.name,
+        //     order.details.recipient.firstName,
+        //     order.details.recipient.lastName,
+        //     order.details.note
+        //     );
+
+        var receiptCard = createReceiptCard(session, orderId);
+
+        // new builder.ReceiptCard(session)
+        //     .title(order.paymentDetails.creditcardHolder)
+        //     .facts([
+        //         builder.Fact.create(session, order.id, 'order_number'),
+        //         builder.Fact.create(session, offuscateNumber(order.paymentDetails.creditcardNumber), 'payment_method')
+        //     ])
+        //     .items([
+        //         builder.ReceiptItem.create(session, order.selection.price, order.selection.name)
+        //             .image(builder.CardImage.create(session, order.selection.imageUrl))
+        //     ])
+        //     .total(order.selection.price)
+        //     .buttons([
+        //         builder.CardAction.openUrl(session, 'https://dev.botframework.com/', 'more_information')
+        //     ]);
 
         var message = new builder.Message(session)
-            .text(messageText)
             .addAttachment(receiptCard);
 
         session.endDialog(message);
+        // session.endDialog("End");
     }).catch(function (err) {
         session.endDialog(session.gettext('error_ocurred', err.message));
     });
 });
+
+
+function createReceiptCard(session, id) {
+    console.log("Building Recipt Cart")
+    output=[];
+    total=0;
+    for (i in session.userData.products)
+    {
+        product=session.userData.products[i];
+        card=builder.ReceiptItem.create(session, product.price, product.name +' ('+product.qty+')')
+            .image(builder.CardImage.create(session, product.imageUrl));
+        output.push(card);
+        total+=product.price*product.qty;
+
+    }
+    session.userData.total=total;//for checkout
+    return new builder.ReceiptCard(session)
+        .title(id)
+        .facts([
+            // builder.Fact.create(session, name, 'Name'),
+            builder.Fact.create(session, 'Debit/Credid Card', 'Payment Method')
+        ])
+        .items(output)
+        .tax('$ 0')
+        .total('$ '+total.toFixed(2))
+    ;
+}
+
+
 
 // Helpers
 function offuscateNumber(cardNumber) {

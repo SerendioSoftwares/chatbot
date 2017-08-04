@@ -13,6 +13,10 @@ lib.dialog('notes', basicPrompterWithExpression(function (input) {
     return input && input.length <= 200;
 }));
 
+lib.dialog('cart', basicPrompterWithExpression(function (input) {
+    return (input==="Cart" || input==="Shop More");
+}));
+
 lib.dialog('size', basicPrompterWithExpressionSize(function (input) {
     return input < 13 && input > 7;
 }));

@@ -58,7 +58,7 @@ module.exports = {
                 // next page
                 pageNumber++;
             }
-            else if(input==='Change Category' || input==='Change Size' || input==='Change Price Range')
+            else if(input==='Change Filters' )
             {
                 return next({selected:input})
             } 
