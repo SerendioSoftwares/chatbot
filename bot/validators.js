@@ -33,14 +33,22 @@ lib.dialog('category', basicPrompterWithExpression(function (input) {
     return (input==="Formal Shoes" || input==="Sports Shoes");
 }));
 
+lib.dialog('problem', basicPrompterWithExpression(function (input) {
+    return (input==="Done" || input==="Report Problem" || input==="Check Another Order");
+}));
+
 lib.dialog('modify', basicPrompterWithExpression(function (input) {
     return (input==="Done" || input.split(' ')[0]==="Edit"|| input.split(' ')[0]==="Delete");
 }));
 
 lib.dialog('phonenumber', basicPrompterWithRegex(PhoneRegex));
 
-lib.dialog('email', basicPrompterWithRegex(EmailRegex));
+lib.dialog('email',  basicPrompterWithExpression(function (input) {
 
+    //Email checked against customer DB
+
+    return true;
+}));
 function basicPrompterWithRegex(regex) {
     return new builder.IntentDialog()
         .onBegin(function (session, args) {
@@ -100,3 +108,18 @@ module.exports.createLibrary = function () {
 
 module.exports.PhoneRegex = PhoneRegex;
 module.exports.EmailRegex = EmailRegex;
+
+
+
+
+
+// Add to cart -> icon
+
+// You've selected:
+// name
+// size
+
+
+
+// Where would you like these shoes to be shipped. Specify full address with and building number, locality and zip- code
+

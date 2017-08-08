@@ -66,20 +66,21 @@ lib.dialog('/', [
     	session.dialogData.priceRange=args.response;
 
 
-
         session.beginDialog('product-selection:/', {category: session.dialogData.category, size : session.dialogData.size, price : session.dialogData.price});
+    
     },
-    function (session, args, next) {
+    function (session, args, next) 
+    {
         // Logic for cart push and update duplicates
 
         console.log(args);
         if(!args.selection)
         {
-            console.log('WOrks');
             session.replaceDialog('/');
         }
 
         else{
+            session.send("You've selected: \n\n Name: "+ args.selection.name + "\n\n Size: " + args.selection.size);
         flag=false;
         temp=null;
         for (i in session.userData.products)
@@ -137,7 +138,9 @@ lib.dialog('category',[
 lib.dialog('size',[
     function(session, args, next)
     {   
-        session.send("What size are you?");
+        choices=["We have some wonderful choices", "A new range of products are in"];
+        session.send(choices[Math.floor(Math.random() * choices.length)] + ", what Size would you like?");
+        
         var welcomeCard = new builder.HeroCard(session)
         .buttons([
             builder.CardAction.imBack(session, "8", "8"),
@@ -161,7 +164,8 @@ lib.dialog('size',[
 lib.dialog('price',[
     function(session, args, next)
     {  
-        session.send("What Price range are you in for?");
+        choices=["A sale is on this week", "We have products in several price ranges"];
+        session.send(choices[Math.floor(Math.random() * choices.length)] + ", which price range are you looking for?");
         var welcomeCard = new builder.HeroCard(session)
         .buttons([
             builder.CardAction.imBack(session, "40", "Less than $40"),
@@ -189,7 +193,7 @@ function getCardsAttachments(session) {
     output=[];
 
     categories=[
-    {title:"Formal", imageUrl:"https://img2.cgtrader.com/items/14184/83c0a31caa/formal-shoes-3d-model-max-obj-3ds-c4d.jpg"}, 
+    {title:"Formal", imageUrl:"http://ecx.images-amazon.com/images/I/71DOBJ7r7bL._UL1500_.jpg"}, 
     {title:"Sports", imageUrl:"http://ecx.images-amazon.com/images/I/71jEqzTCmlL._UL1500_.jpg"}];
     for (i in categories)
     {

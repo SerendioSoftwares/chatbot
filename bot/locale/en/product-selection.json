@@ -1,11 +1,11 @@
 {
 	"selection_question": "What would you like?",
     "title_show_more": "Want more options?",
-    "show_more": "Next Page",
-    "select": "Select: ",
+    "show_more": "Show More",
+    "select": "Buy: ",
     "unknown_option": "I couldn't understand your selection. Please try again.",
     "choose_category": "Please select a category:",
     "choose_bouquet_from_category": "Please select a Product for \"%s\" category:",
     "view_bouquets": "View",
-    "choose_this": "Select"
+    "choose_this": "Buy"
 }

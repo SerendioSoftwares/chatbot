@@ -1,33 +1,23 @@
 var builder = require('botbuilder');
 
 var lib = new builder.Library('help');
+
+
 lib.dialog('/',[ 
-	function (session)
+	function (session, args, next)
 	{
-		builder.Prompts.text(session, "Type in your Query to get help. \n\n Alternately type in \"order\" or your Order ID to review past orders.");
+		session.send( "Type in your Query to get help. \n\n Alternately type in \"order\" or your Order ID to review past orders.");
+		next();
 	},
 	function (session, args)
 	{
 
-		response=session.message.text;
 
+		session.beginDialog('query:/');
 
-		//Check Query/Order
-
-
-		if(true)
-		{
-
-		}
-		else if (true) 
-		{
-			
-		}
-		else
-		{
-			session.send("Sorry, couldn't interpret that.")
-		}
-
+	},
+	function (session, args)
+	{
 		var welcomeCard = new builder.Message(session).addAttachment(new builder.HeroCard(session)
         	.buttons([
             builder.CardAction.imBack(session, "Other Query", "Other Query"),
@@ -53,9 +43,9 @@ lib.dialog('/',[
 
 // lib.dialog('query',
 // [
-// 	function (session)
+// 	function (session, args)
 // 	{
-
+//         var foodNameEntity = builder.EntityRecognizer.findEntity(args.entities, 'foodName');
 // 	},
 
 // 	function (session)

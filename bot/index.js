@@ -56,8 +56,10 @@ bot.library(require('./dialogs/delivery').createLibrary());
 bot.library(require('./dialogs/details').createLibrary());
 bot.library(require('./dialogs/checkout').createLibrary());
 bot.library(require('./dialogs/settings').createLibrary());
-bot.library(require('./dialogs/help').createLibrary());
 bot.library(require('./dialogs/search').createLibrary());
+
+bot.library(require('./dialogs/help').createLibrary());
+bot.library(require('./dialogs/query').createLibrary());
 
 
 // Validators

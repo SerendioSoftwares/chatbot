@@ -14,8 +14,7 @@ lib.dialog('/', [
                 .buttons([
                     builder.CardAction.imBack(session, "Shop More", "Shop More"),
                 ]);
-                session.send(new builder.Message(session)
-                .addAttachment(welcomeCard));
+                builder.Prompts.text(session, (new builder.Message(session).addAttachment(welcomeCard)));
                 }
         else{
             session.send(new builder.Message(session).addAttachment(createReceiptCard(session)));
@@ -25,18 +24,15 @@ lib.dialog('/', [
                 builder.CardAction.imBack(session, "Shop More", "Shop More"),
                 builder.CardAction.imBack(session, "Checkout", "Checkout")
             ]);
-            session.send(new builder.Message(session)
-            .addAttachment(welcomeCard));
+            builder.Prompts.text(session, (new builder.Message(session).addAttachment(welcomeCard)));
             }
-        next();
+
+
+
+        // next();
     },
 
-    function (session, args)
-    {
-        builder.Prompts.text(session, 'Would you like to Modify Cart,  Checkout, or Shop More? \n\n Click the respective buttons to continue.');
 
-    },
-    
     function (session, args, next) {
         response = args.response;
 

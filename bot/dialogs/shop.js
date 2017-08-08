@@ -23,7 +23,7 @@ lib.dialog('/', [
 
     function (session, args, next) 
     {
-        if(args.selection==='Change Filters')
+        if(args.selection==='Modify Selection')
         {
             session.beginDialog('/');
         }

@@ -58,7 +58,7 @@ module.exports = {
                 // next page
                 pageNumber++;
             }
-            else if(input==='Change Filters' )
+            else if(input==='Modify Selection' )
             {
                 return next({selected:input})
             } 
@@ -102,7 +102,7 @@ module.exports = {
                         // .title(settings.showMoreTitle)
                         .buttons([
                             builder.CardAction.imBack(session, session.gettext(settings.showMoreValue), settings.showMoreValue),
-                            builder.CardAction.imBack(session, 'Change Filters' , 'Change Filters'),
+                            builder.CardAction.imBack(session, 'Modify Selection' , 'Modify Selection'),
                             // builder.CardAction.imBack(session, 'Change Category' , 'Change Category'),
                             // builder.CardAction.imBack(session, 'Change Size' , 'Change Size'),
                             // builder.CardAction.imBack(session, 'Change Price Range' , 'Change Price Range')
@@ -115,7 +115,7 @@ module.exports = {
                      var moreCard = new builder.HeroCard(session)
                         // .title(settings.showMoreTitle)
                         .buttons([
-                            builder.CardAction.imBack(session, 'Change Filters' , 'Change Filters'),                            // builder.CardAction.imBack(session, 'Change Category' , 'Change Category'),
+                            builder.CardAction.imBack(session, 'Modify Selection' , 'Modify Selection'),                            // builder.CardAction.imBack(session, 'Change Category' , 'Change Category'),
                             // builder.CardAction.imBack(session, 'Change Size' , 'Change Size'),
                             // builder.CardAction.imBack(session, 'Change Price Range' , 'Change Price Range')
 

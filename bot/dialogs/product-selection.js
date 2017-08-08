@@ -39,8 +39,8 @@ lib.dialog('/',
 
         function (session, args, next) {
 
-
-            session.send('choose_bouquet_from_category', session.dialogData.category);
+            choices=["Here are some products based on the choices you've made, hope you like it.", "Here are some products matching your requirements, hope you like it."];
+            session.send(choices[Math.floor(Math.random() * choices.length)]);
             // session.dialogData.category = category;
             session.message.text = null;            // remove message so next step does not take it as input
             next();
@@ -62,7 +62,7 @@ lib.dialog('/',
         function (session, args, next) {
             console.log('Selected-----------------------');
             console.log(args.selected);
-            if(args.selected==='Change Filters')
+            if(args.selected==='Modify Selection')
             {
                 session.endDialog();
             }
