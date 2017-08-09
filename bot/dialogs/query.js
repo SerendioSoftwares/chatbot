@@ -1,6 +1,7 @@
 var builder = require('botbuilder');
 
 var lib = new builder.Library('query');
+var shop = require('../backend');
 
 
 const LuisModelUrl = 'https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/b1439cf5-bc52-47dc-a1d1-0824ab3c8025?subscription-key=011183f533c94864b0117e8c16778824&timezoneOffset=0&q=';
@@ -11,7 +12,6 @@ var intents = new builder.IntentDialog({ recognizers: [recognizer] })
 .matches('<yourIntent>')... See details at http://docs.botframework.com/builder/node/guides/understanding-natural-language/
 */
 .matches('order', (session, args) =>{
-   session.send('Works!');
    var number=null;
    if(args.entities[0])
    {
@@ -24,26 +24,27 @@ var intents = new builder.IntentDialog({ recognizers: [recognizer] })
 })
 
 .matches('billing', (session, args) =>{
-   session.send('billing!');
+   session.send('Our Secure Payment Gateway ensures hassle free payment online. Choose from a range of options including Card Payment, Net Banking or Voucher enchashment. In the event that a problem has arisen during payment, kindly contact our sales team.');
    session.endDialog();
 })
 
 .matches('delivery', (session, args) =>{
-   session.send('delivery!');
+   session.send('Products ordered from our store will be delivered as soon as possible using our trusted delivery partners. Deliver typically takes between 4-7 days, but might take longer if the delivery address is far away from our major warehouse locations.');
    session.endDialog();
 })
 
 .matches('quality', (session, args) =>{
-   session.send('quality!');
+   session.send('All items in our store come from reputed manufacturers, obviating the need for further quality inspection. However, if you are concered with the quality of a product received, you may choose to report it (within the window of 7 days from receiving the product), following which the product may be replaced.');
    session.endDialog();
 })
 
 .matches('return', (session, args) =>{
-   session.send('return!');
+   session.send('Returning the product within 1 week of receiving the order will be accepted without any questions. The warranty for the product is covered by the manufacturer. The store cannot be held responsible for any product related issues post the 1 week return window.');
    session.endDialog();
 })
 
 .onDefault((session) => {
+	session.send(shop.test());
     session.send('Sorry, I did not understand \'%s\'.', session.message.text);
     session.endDialog();
 });

@@ -1,3 +1,4 @@
+var shop = require('../backend');
 var builder = require('botbuilder');
 
 var lib = new builder.Library('help');

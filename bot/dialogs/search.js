@@ -11,11 +11,9 @@ var lib = new builder.Library('search');
 lib.dialog('/', [
 
     function(session, args, next){
-        console.log('ZZZZZZZZZZZZZZZZZ');
-        console.log(session.dialogData);
+
         if (!session.dialogData.category)
         {
-            console.log('11111111111111111');
             session.beginDialog('category');
             
         }
@@ -115,7 +113,6 @@ lib.dialog('/', [
 lib.dialog('category',[
     function(session, args, next)
     {   session.message.text=null;
-        console.log('22222222222222222222222');
         var cards = getCardsAttachments(session);
         var reply = new builder.Message(session)
         .attachmentLayout(builder.AttachmentLayout.carousel)
