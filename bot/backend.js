@@ -20,6 +20,16 @@ module.exports = {
 	    console.log(data);
 	    console.log(JSON.parse(res));
 		});
+
+    },
+
+    customer: function (address) {
+        WooCommerce.get('orders', function(err, data, res){
+	    console.log(err);
+	    console.log(data);
+	    console.log(JSON.parse(res));
+		});
+		
     },
 
     

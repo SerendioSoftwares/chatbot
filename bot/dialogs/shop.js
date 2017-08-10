@@ -90,23 +90,6 @@ lib.dialog('/', [
 
 
 
-    // function (session, args) {
-    //     // Retrieve deliveryDate, continue to details
-    //     session.dialogData.deliveryDate = args.deliveryDate;
-    //     session.dialogData.recipientSize = args.recipientSize;
-    //     // session.send('confirm_choice', session.dialogData.selection.name, session.dialogData.recipientSize, session.dialogData.deliveryDate.toLocaleDateString());
-    //     session.beginDialog('details:/');
-    // },
-    // function (session, args) {
-    //     // Retrieve details, continue to billing address
-    //     session.dialogData.details = args.details;
-    //     session.beginDialog('address:billing');
-    // },
-    // function (session, args, next) {
-    //     // Retrieve billing address
-    //     session.dialogData.billingAddress = args.billingAddress;
-    //     next();
-    // },
     function (session, args) {
         // Continue to checkout
         session.dialogData.recipientAddress = args.address;

@@ -60,13 +60,13 @@ lib.dialog('/', [
 
         
     },
-    function (session, args, next) {
+
+    function (session, args, next) 
+    {
     	session.dialogData.priceRange=args.response;
-
-
         session.beginDialog('product-selection:/', {category: session.dialogData.category, size : session.dialogData.size, price : session.dialogData.price});
-    
     },
+
     function (session, args, next) 
     {
         // Logic for cart push and update duplicates
@@ -78,7 +78,7 @@ lib.dialog('/', [
         }
 
         else{
-            session.send("You've selected: \n\n Name: "+ args.selection.name + "\n\n Size: " + args.selection.size);
+            session.send("You've selected: \n\n Name: "+ args.selection.name + "\n\n Size: " + args.selection.size + "\n\n Price: $" + args.selection.price );
         flag=false;
         temp=null;
         for (i in session.userData.products)
@@ -165,10 +165,10 @@ lib.dialog('price',[
         session.send(choices[Math.floor(Math.random() * choices.length)] + ", which price range are you looking for?");
         var welcomeCard = new builder.HeroCard(session)
         .buttons([
-            builder.CardAction.imBack(session, "40", "Less than $40"),
-            builder.CardAction.imBack(session, "60", "$40-$60"),
-            builder.CardAction.imBack(session, "80", "$60-$80"),
-            builder.CardAction.imBack(session, "80", "Above $80"),
+            builder.CardAction.postBack(session, "40", "Less than $40"),
+            builder.CardAction.postBack(session, "60", "$40-$60"),
+            builder.CardAction.postBack(session, "80", "$60-$80"),
+            builder.CardAction.postBack(session, "80", "Above $80"),
         ]);
         session.beginDialog('validators:price', {
             prompt: session.send(new builder.Message(session)

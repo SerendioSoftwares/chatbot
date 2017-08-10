@@ -105,7 +105,8 @@ lib.dialog('completed', function (session, args, next) {
         var message = new builder.Message(session)
             .addAttachment(receiptCard);
 
-        session.endDialog(message);
+        session.send(message);
+        session.endDialog("Thank you for shopping with us.\n\nDetails about the order and other queries can be directed at the support section of the chatbot.")
         // session.endDialog("End");
     }).catch(function (err) {
         session.endDialog(session.gettext('error_ocurred', err.message));

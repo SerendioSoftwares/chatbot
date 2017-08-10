@@ -27,12 +27,13 @@ module.exports = {
 
         // map item info into HeroCard
         var asCard = function (session, cardInfo) {
+            console.log(cardInfo)
             var card = new builder.HeroCard()
                 .title(cardInfo.title)
                 .buttons([
                     new builder.CardAction()
                         .type('imBack')
-                        .value(session.gettext(settings.selectTemplate) + cardInfo.title)
+                        .value(session.gettext(settings.selectTemplate) + cardInfo.title + "---")
                         .title(session.gettext(cardInfo.buttonLabel))
                 ]);
 
