@@ -28,6 +28,7 @@ lib.dialog('/',
             console.log(args);
             session.dialogData.category=args.category;
             session.dialogData.size=args.size;
+            session.dialogData.price=args.price;
             next();
 
             
@@ -50,6 +51,7 @@ lib.dialog('/',
 
             var categoryName = session.dialogData.category;
             var size= session.dialogData.category;
+            session.userData.money=session.dialogData.price;
             CarouselPagination.create(
                 function (pageNumber, pageSize) { return products.getProducts(categoryName, size, pageNumber, pageSize); },
                 products.getProduct,

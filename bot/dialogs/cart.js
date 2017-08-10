@@ -184,10 +184,10 @@ function createReceiptCard(session) {
     }
     session.userData.total=total;//for checkout
     return new builder.ReceiptCard(session)
-        .title('John Doe')
+        .title('Cart:')
         .facts([
             builder.Fact.create(session, '1234', 'Order Number'),
-            builder.Fact.create(session, 'VISA 5555-****', 'Payment Method')
+            // builder.Fact.create(session, 'VISA 5555-****', 'Payment Method')
         ])
         .items(output)
         .tax('$ 0')

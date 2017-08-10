@@ -33,12 +33,23 @@ module.exports = {
                 .buttons([
                     new builder.CardAction()
                         .type('imBack')
-                        .value(session.gettext(settings.selectTemplate) + cardInfo.title + "---")
+                        .value(session.gettext(settings.selectTemplate) + cardInfo.title )
                         .title(session.gettext(cardInfo.buttonLabel))
                 ]);
 
             if (cardInfo.subtitle) {
-                card = card.subtitle(cardInfo.subtitle);
+                console.log(Math.floor(Math.random()*10));
+                if (session.userData.money==="40")
+                {
+                    console.log("Works----");
+
+                    card = card.subtitle('$' + 40-Math.floor(Math.random() * 10));
+                }
+                else 
+                {
+                    temp=(parseInt(session.userData.money) + Math.floor(Math.random() * 10))
+                    card=card.subtitle('$' + temp)
+                }
             }
 
             if (cardInfo.imageUrl) {

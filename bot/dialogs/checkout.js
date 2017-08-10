@@ -129,7 +129,7 @@ function createReceiptCard(session, id) {
     }
     session.userData.total=total;//for checkout
     return new builder.ReceiptCard(session)
-        .title(id)
+        .title("Order No: 1234")
         .facts([
             // builder.Fact.create(session, name, 'Name'),
             builder.Fact.create(session, 'Debit/Credid Card', 'Payment Method')

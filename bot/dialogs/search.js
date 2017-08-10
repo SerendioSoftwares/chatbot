@@ -166,9 +166,9 @@ lib.dialog('price',[
         var welcomeCard = new builder.HeroCard(session)
         .buttons([
             builder.CardAction.postBack(session, "40", "Less than $40"),
-            builder.CardAction.postBack(session, "60", "$40-$60"),
-            builder.CardAction.postBack(session, "80", "$60-$80"),
-            builder.CardAction.postBack(session, "80", "Above $80"),
+            builder.CardAction.postBack(session, "50", "$40-$60"),
+            builder.CardAction.postBack(session, "70", "$60-$80"),
+            builder.CardAction.postBack(session, "100", "Above $80"),
         ]);
         session.beginDialog('validators:price', {
             prompt: session.send(new builder.Message(session)
