@@ -132,7 +132,7 @@ function createReceiptCard(session, id) {
         .title("Order No: 1234")
         .facts([
             // builder.Fact.create(session, name, 'Name'),
-            builder.Fact.create(session, 'Debit/Credid Card', 'Payment Method')
+            builder.Fact.create(session, 'Debit/Credit Card', 'Payment Method')
         ])
         .items(output)
         .tax('$ 0')
