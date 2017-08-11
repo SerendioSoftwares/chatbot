@@ -121,7 +121,7 @@ function createReceiptCard(session, id) {
     for (i in session.userData.products)
     {
         product=session.userData.products[i];
-        card=builder.ReceiptItem.create(session, product.price, product.name +' ('+product.qty+')')
+        card=builder.ReceiptItem.create(session, "$ "+ product.price, product.name +' ('+product.qty+')')
             .image(builder.CardImage.create(session, product.imageUrl));
         output.push(card);
         total+=product.price*product.qty;
