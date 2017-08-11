@@ -7,7 +7,7 @@ var defaultSettings = {
     pageSize: 10,
     unknownOption: 'unknown_option'
 };
-
+prices={}
 module.exports = {
     create: function (getPageFunc, getItemFunc, itemToCardFunc, settings) {
         // parameter validation
@@ -42,13 +42,18 @@ module.exports = {
                 if (session.userData.money==="40")
                 {
                     console.log("Works----");
+                    price=40-Math.floor(Math.random() * 10);
+                    card = card.subtitle('$' + price);
+                    prices[cardInfo.title]=price;
+                    console.log(prices[cardInfo.title])
 
-                    card = card.subtitle('$' + 40-Math.floor(Math.random() * 10));
                 }
                 else 
                 {
-                    temp=(parseInt(session.userData.money) + Math.floor(Math.random() * 10))
-                    card=card.subtitle('$' + temp)
+                    price=(parseInt(session.userData.money) + Math.floor(Math.random() * 10))
+                    card=card.subtitle('$' + price)
+                    prices[cardInfo.title]=price;
+                    console.log(prices[cardInfo.title])
                 }
             }
 
@@ -72,6 +77,7 @@ module.exports = {
             }
             else if(input==='Modify Selection' )
             {
+                
                 return next({selected:input})
             } 
 
@@ -82,11 +88,18 @@ module.exports = {
                     if (!selectedItem) {
                         return session.send(settings.unknownOption);
                     }
+                    console.log("-------------------")
+
+                    console.log(selectedItem)
 
                     // reset page
                     session.dialogData.pageNumber = null;
 
                     // return selection to dialog stack
+
+                    console.log(prices[selectedItem.name])
+                    selectedItem.price=prices[selectedItem.name];
+                    console.log(selectedItem)
                     return next({ selected: selectedItem });
                 });
 
