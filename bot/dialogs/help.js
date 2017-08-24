@@ -13,7 +13,6 @@ lib.dialog('/',[
 	function (session, args)
 	{
 
-
 		session.beginDialog('query:/');
 
 	},

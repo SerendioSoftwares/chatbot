@@ -1,10 +1,13 @@
 var builder = require('botbuilder');
 var siteUrl = require('./site-url');
-
+var shop = require('./backend');
 var connector = new builder.ChatConnector({
     appId: process.env.MICROSOFT_APP_ID,
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
+
+
+
 
 // Welcome Dialog
 var MainOptions = {
@@ -12,7 +15,10 @@ var MainOptions = {
     Support: 'main_options_talk_to_support'
 };
 
-var bot = new builder.UniversalBot(connector, 
+// shop.categories();
+
+var bot = new builder.UniversalBot(connector, [
+
     function (session) {
 
     if (localizedRegex(session, [MainOptions.Shop]).test(session.message.text)) {
@@ -34,9 +40,10 @@ var bot = new builder.UniversalBot(connector,
             builder.CardAction.imBack(session, session.gettext(MainOptions.Support), MainOptions.Support)
         ]);
 
+
     session.send(new builder.Message(session)
         .addAttachment(welcomeCard));
-});
+}]);
 
 // Enable Conversation Data persistence
 bot.set('persistConversationData', true);

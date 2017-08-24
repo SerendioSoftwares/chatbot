@@ -98,8 +98,9 @@ lib.dialog('modify',[
         {
             temp=response.split(' ');
             // response=JSON.parse(response);
-            console.log(temp);
-            console.log(temp[0]);
+            console.log('000000000000000000');
+            console.log(session.userData.products);
+            
             session.dialogData.action=temp[0];
             session.dialogData.id=temp[1];
 
@@ -111,6 +112,7 @@ lib.dialog('modify',[
                 session.replaceDialog('modify');
             }
             else if (session.dialogData.action==="Edit") {
+                session.dialogData.check = session.userData.products[session.dialogData.id].stock_quantity;
                 next();
             }
             
@@ -120,7 +122,8 @@ lib.dialog('modify',[
     {
         session.beginDialog('validators:qty', {
             prompt: session.send("How many would you like?"),
-            retryPrompt: session.gettext('Enter a number between 1 and 10')
+            retryPrompt: session.gettext('Sorry! Enter a number between 1 and '+ session.dialogData.check),
+            check: session.dialogData.check
         });
     },
     function(session, args)
@@ -155,11 +158,20 @@ function getCardsAttachments(session) {
     for (i in session.userData.products)
     {
         product=session.userData.products[i];
+
+        temp=''//attributes
+        for (j in product.attributes)
+        {
+            temp += product.attributes[j].name + ' : '+product.attributes[j].option + ', ';
+        }
+
+        temp=temp.substr(0, temp.length - 2);
+
         card=new builder.HeroCard(session)
         .title(product.name)
-        .subtitle("Price: $"+product.price + ", " + "Size: "+product.size)
-        .text("Quantity: "+product.qty)
-        .images([builder.CardImage.create(session, product.imageUrl)])
+        .subtitle(temp)
+        .text("Price: $"+product.price + ", Quantity: "+product.qty)
+        .images([builder.CardImage.create(session, product.image.src)])
         .buttons([
             builder.CardAction.imBack(session, 'Edit '+i+ ' . ' + product.name, 'Edit Quantity'),
             builder.CardAction.imBack(session, 'Delete '+i+ ' . '+ product.name, 'Delete')]);
@@ -175,9 +187,12 @@ function createReceiptCard(session) {
     total=0;
     for (i in session.userData.products)
     {
+
         product=session.userData.products[i];
-        card=builder.ReceiptItem.create(session, "$ "+product.price.toString(), product.name +' ('+product.qty+')')
-            .image(builder.CardImage.create(session, product.imageUrl));
+        console.log(product)
+
+        card=builder.ReceiptItem.create(session, "$ "+ product.price.toString(), product.name +' ('+product.qty+')')
+            .image(builder.CardImage.create(session, product.image.src));
         output.push(card);
         total+=product.price*product.qty;
 
@@ -186,7 +201,7 @@ function createReceiptCard(session) {
     return new builder.ReceiptCard(session)
         .title('Cart:')
         .facts([
-            builder.Fact.create(session, '1234', 'Order Number'),
+            // builder.Fact.create(session, '1234', 'Order Number'),
             // builder.Fact.create(session, 'VISA 5555-****', 'Payment Method')
         ])
         .items(output)

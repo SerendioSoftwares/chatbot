@@ -1,8 +1,8 @@
 var builder = require('botbuilder');
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-var xhr = new XMLHttpRequest();
+// var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+// var xhr = new XMLHttpRequest();
 var model = 'https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/e8b32b8d-5d2d-4ebd-9d5f-af666c748b12?subscription-key=011183f533c94864b0117e8c16778824&timezoneOffset=0&verbose=true&q=';
-
+var shop = require('./backend')
 
 var PhoneRegex = new RegExp(/^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/);
 var EmailRegex = new RegExp(/[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/);
@@ -25,13 +25,41 @@ lib.dialog('price', basicPrompterWithExpression(function (input) {
     return (input>30 && input<120);
 }));
 
-lib.dialog('qty', basicPrompterWithExpression(function (input) {
-    return (input>0 && input<11);
+lib.dialog('qty', basicPrompterWithExpression(function (input, check) {
+    return (input>0 && input<=check);
 }));
 
-lib.dialog('category', basicPrompterWithExpression(function (input) {
-    return (input==="Formal Shoes" || input==="Sports Shoes");
+lib.dialog('category', basicPrompterWithExpression(function (input, check) {
+    output=check;
+    console.log("-----");
+    // console.log(check);
+    categories=[];
+    for (i in output)
+    {
+        categories.push(output[i].name)
+    }
+    console.log(categories);
+    return (categories.indexOf(input) > -1);
 }));
+
+lib.dialog('attributes', basicPrompterWithExpression(function (input, check){
+    products = shop.result('products');
+    output=check;
+    console.log("-----");
+    // console.log(check);
+    categories=[]
+    for (i in output)
+    {
+        categories.push(output[i].name)
+    }
+    console.log(categories);
+    return (categories.indexOf(input) > -1);
+}));
+
+lib.dialog('options', basicPrompterWithExpression(function (input, check){
+    return (check.indexOf(input) > -1);
+}));
+
 
 lib.dialog('problem', basicPrompterWithExpression(function (input) {
     return (input==="Done" || input==="Report Problem" || input==="Check Another Order");
@@ -90,10 +118,12 @@ function basicPrompterWithExpression(expression) {
     return new builder.IntentDialog()
         .onBegin(function (session, args) {
             session.dialogData.retryPrompt = args.retryPrompt;
+            session.dialogData.check=args.check;
             session.send(args.prompt);
-        }).onDefault(function (session) {
+        }).onDefault(function (session, args) {
+            console.log(args);
             var input = session.message.text;
-            if (expression(input)) {
+            if (expression(input, session.dialogData.check)) {
                 session.endDialogWithResult({ response: input });
             } else {
                 session.send(session.dialogData.retryPrompt);

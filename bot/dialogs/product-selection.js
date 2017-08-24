@@ -3,7 +3,7 @@ var builder = require('botbuilder');
 var products = require('../../services/products');
 var SimpleWaterfallDialog = require('./SimpleWaterfallDialog');
 var CarouselPagination = require('./CarouselPagination');
-
+var shop = require('../backend');
 var carouselOptions = {
     showMoreTitle: 'title_show_more',
     showMoreValue: 'show_more',
@@ -25,35 +25,29 @@ lib.dialog('/',
         // First message
         function (session, args, next) {
             // builder.Prompts.text(session, 'What would you like?');
-            console.log(args);
+            // console.log(session.userData);
             session.dialogData.category=args.category;
-            session.dialogData.size=args.size;
-            session.dialogData.price=args.price;
-            next();
+
+            choices=["Here are some products based on the choices you've made, hope you like them.", "Here are some products matching your requirements, hope you like them."];
+            session.send(choices[Math.round(Math.random() * choices.length)]);
+
+            shop.woo().get('products?category='+session.userData.category.id,  function(err, data, res) {
+                session.dialogData.products=JSON.parse(res);
+                // console.log(products);
+                next();
+            });
 
             
+            
+            
         },
-        // Show Categories
-        // CarouselPagination.create(products.getCategories, products.getCategory, categoryMapping, carouselOptions),
-        // Category selected
 
 
-        function (session, args, next) {
 
-            choices=["Here are some products based on the choices you've made, hope you like it.", "Here are some products matching your requirements, hope you like it."];
-            session.send(choices[Math.floor(Math.random() * choices.length)]);
-            // session.dialogData.category = category;
-            session.message.text = null;            // remove message so next step does not take it as input
-            next();
-        },
         // Show Products
         function (session, args, next) {
-
-            var categoryName = session.dialogData.category;
-            var size= session.dialogData.category;
-            session.userData.money=session.dialogData.price;
             CarouselPagination.create(
-                function (pageNumber, pageSize) { return products.getProducts(categoryName, size, pageNumber, pageSize); },
+                function (pageNumber, pageSize) { return products.getProducts(session.dialogData.products, pageNumber, pageSize); },
                 products.getProduct,
                 productMapping,
                 carouselOptions
@@ -73,10 +67,108 @@ lib.dialog('/',
                 args.selected.qty=1;
                 args.selected.size=session.dialogData.size;
                 // this is last step, calling next with args will end in session.endDialogWithResult(args)
-                next({ selection: args.selected });
+                next({ selected: args.selected });
             }
-        }
+}
+
     ]));
+
+
+lib.dialog('variation', [
+    function (session, args, next)
+    {
+        shop.woo().get('products/'+args.parent.id+'/variations',  
+        function(err, data, res) {
+            session.dialogData.variations=JSON.parse(res);
+            // console.log(session.dialogData.variations);
+            next();
+        });
+    },
+    function (session, args, next)
+    {
+        session.send("Variations of the selected product are available...")
+        result= getCardsAttachments(session, session.dialogData.variations);
+        console.log("ppppppppppppppppppppppppp")
+        // console.log(result.products);
+        session.dialogData.variations = result.products;
+        var cards = result.cards;
+
+        var reply = new builder.Message(session)
+        .attachmentLayout(builder.AttachmentLayout.carousel)
+        .attachments(cards);
+
+        session.beginDialog('validators:attributes', {
+            prompt: session.send(reply),
+            retryPrompt: session.gettext('Choose one from the given options'),
+            check: session.dialogData.variations
+        });
+        //Get product variation data.
+        //If variation false for attribute-leave it (handle at search)
+        //Else retrieve variations
+    },
+    function(session, args,next)
+    {
+        selected=_.find(session.dialogData.variations, function (o) { return o.name ===session.message.text;});
+        for (i in selected.attributes)
+        {
+            temp={
+                'id':selected.attributes[i].id,
+                'name':selected.attributes[i].name,
+                'option':selected.attributes[i].option
+            }
+            session.userData.attributes.push(temp)
+
+        }
+        
+        selected=_.find(session.dialogData.variations, function (o) { return o.name ===session.message.text;});
+        session.endDialogWithResult({selected:selected});
+    }
+
+]);
+
+
+
+
+
+function getCardsAttachments(session, products) {
+    cards=[];
+    products_temp=[]//new product list with title
+    for (i in products)
+    {
+        // console.log(categories[i]);
+
+        product=products[i];
+        products_temp[i]=product;
+
+        name=''
+        for (j in product.attributes)
+        {
+            // console.log(product.attributes[j]);
+            name+=product.attributes[j].name+' : '+product.attributes[j].option+', ';
+        }
+        name=temp=name.substr(0, name.length - 2);
+        products_temp[i].name=name;
+
+        //Build Card
+        card=new builder.HeroCard(session)
+        // .title(product.title)
+        // .subtitle("Price: "+product.price + "," + "Size: "+product.size)
+        // .text("Quantity: "+product.qty)
+        .images([builder.CardImage.create(session, product.image.src)])
+        .buttons([
+            builder.CardAction.imBack(session, name, name)]);
+        cards.push(card);
+    }        
+
+    return {products: products_temp, cards: cards}
+        
+
+}
+
+
+
+
+
 
 function categoryMapping(category) {
     return {
@@ -89,8 +181,8 @@ function categoryMapping(category) {
 function productMapping(product) {
     return {
         title: product.name,
-        subtitle: '$ ' + product.price.toFixed(2),
-        imageUrl: product.imageUrl,
+        subtitle: '$ ' + product.price,
+        imageUrl: product.images[0].src,
         buttonLabel: 'choose_this'
     };
 }

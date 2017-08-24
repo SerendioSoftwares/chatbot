@@ -1,5 +1,6 @@
 // This loads the environment variables from the .env file
 require('dotenv-extended').load();
+var shop = require('./bot/backend');
 
 var express = require('express');
 var path = require('path');
@@ -16,10 +17,24 @@ app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Register your web app routes here
-app.get('/', function (req, res, next) {
-  res.render('index', { title: 'Shoe Mart' });
-});
 
+// var promise = new Promise(function(resolve, reject) {
+//   // do a thing, possibly async, then…
+//   shop.categories();
+  
+// });
+
+
+// promise.then(function(result) {
+//   console.log(shop.categories_result)
+   
+
+// });
+
+ app.get('/', function (req, res, next) {
+      res.render('index', { title: 'Shoe Mart' });
+    });
+  
 // Register Checkout page
 var checkout = require('./checkout');
 app.use('/checkout', checkout);

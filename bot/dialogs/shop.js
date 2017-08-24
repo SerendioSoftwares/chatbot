@@ -1,7 +1,7 @@
 var util = require('util');
 var builder = require('botbuilder');
-var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-var xhr = new XMLHttpRequest();
+// var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+// var xhr = new XMLHttpRequest();
 var lib = new builder.Library('shop');
 
 

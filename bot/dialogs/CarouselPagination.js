@@ -27,6 +27,7 @@ module.exports = {
 
         // map item info into HeroCard
         var asCard = function (session, cardInfo) {
+            console.log("--========---================================================")
             console.log(cardInfo)
             var card = new builder.HeroCard()
                 .title(cardInfo.title)
@@ -38,23 +39,24 @@ module.exports = {
                 ]);
 
             if (cardInfo.subtitle) {
-                console.log(Math.floor(Math.random()*10));
-                if (session.userData.money==="40")
-                {
-                    console.log("Works----");
-                    price=40-Math.floor(Math.random() * 10);
-                    card = card.subtitle('$' + price);
-                    prices[cardInfo.title]=price;
-                    console.log(prices[cardInfo.title])
+                // console.log(Math.floor(Math.random()*10));
+                // if (session.userData.money==="40")
+                // {
+                //     console.log("Works----");
+                //     price=40-Math.floor(Math.random() * 10);
+                //     card = card.subtitle('$' + price);
+                //     prices[cardInfo.title]=price;
+                //     console.log(prices[cardInfo.title])
 
-                }
-                else 
-                {
-                    price=(parseInt(session.userData.money) + Math.floor(Math.random() * 10))
-                    card=card.subtitle('$' + price)
-                    prices[cardInfo.title]=price;
-                    console.log(prices[cardInfo.title])
-                }
+                // }
+                // else 
+                // {
+                //     price=(parseInt(session.userData.money) + Math.floor(Math.random() * 10))
+                //     card=card.subtitle('$' + price)
+                //     prices[cardInfo.title]=price;
+                //     console.log(prices[cardInfo.title])
+                // }
+                card=card.subtitle(cardInfo.subtitle)
             }
 
             if (cardInfo.imageUrl) {
@@ -64,7 +66,7 @@ module.exports = {
             return card;
         };
 
-        // return dialog handler funciton
+        // return dialog handler funciton (END)
         return function (session, args, next) {
             var pageNumber = session.dialogData.pageNumber || 1;
             var input = session.message.text;
@@ -79,11 +81,12 @@ module.exports = {
             {
                 
                 return next({selected:input})
-            } 
+            }
 
             else if (input && isSelection(input, selectPrefix)) {
                 // Validate selection
                 var selectedName = input.substring(selectPrefix.length);
+                console.log(selectedName);
                 getItemFunc(selectedName).then(function (selectedItem) {
                     if (!selectedItem) {
                         return session.send(settings.unknownOption);
@@ -97,9 +100,7 @@ module.exports = {
 
                     // return selection to dialog stack
 
-                    console.log(prices[selectedItem.name])
-                    selectedItem.price=prices[selectedItem.name];
-                    console.log(selectedItem)
+
                     return next({ selected: selectedItem });
                 });
 
@@ -107,7 +108,7 @@ module.exports = {
                 return;
             }
 
-            // retrieve from service and send items
+            // retrieve from service and send items(FIRST)
             getPageFunc(pageNumber, settings.pageSize).then(function (pageResult) {
                 // save current page number
                 session.dialogData.pageNumber = pageNumber;
@@ -119,7 +120,7 @@ module.exports = {
                 var message = new builder.Message(session)
                     .attachmentLayout(builder.AttachmentLayout.carousel)
                     .attachments(cards);
-                session.send(message);
+                session.send(message);  
 
                 // more items link
                 if (pageResult.totalCount > pageNumber * settings.pageSize) {

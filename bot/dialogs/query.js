@@ -44,9 +44,11 @@ var intents = new builder.IntentDialog({ recognizers: [recognizer] })
 })
 
 .onDefault((session) => {
-	session.send(shop.test());
+
+	
     session.send('Sorry, I did not understand \'%s\'.', session.message.text);
     session.endDialog();
+
 });
 
 
@@ -80,7 +82,9 @@ lib.dialog('valid',
 ]);
 
 lib.dialog('order',
-[
+[		
+		
+
 	function (session, args, next)
 	{
 		response=session.message.text;

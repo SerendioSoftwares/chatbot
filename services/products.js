@@ -33,22 +33,7 @@ var sports=[
 {name:'Columbus TB-4 Mesh Sports Shoes for Men',  imageUrl: 'http://ecx.images-amazon.com/images/I/71JHTACX8nL._UL1500_.jpg', price: Math.floor(Math.random() * 100) + 10 + .99},
 ];
 
-// var allCategories = _.times(5)
-//     .map(function (i) {
-//         return {
-//             name: 'Flower ' + (i + 1),
-//             imageUrl: 'https://placeholdit.imgix.net/~text?txtsize=48&txt=Flower%20' + (i + 1) + '&w=640&h=330'
-//         };
-//     });
-
-// var allProducts = _.times(17)
-//     .map(function (i) {
-//         return {
-//             name: 'Bouquet ' + (i + 1) + '\u2122',
-//             imageUrl: 'https://placeholdit.imgix.net/~text?txtsize=48&txt=Bouquet%20' + (i + 1) + '&w=640&h=330',
-//             price: Math.floor(Math.random() * 100) + 10 + .99
-//         };
-//     });
+var products=null;
 
 var productsService = {
     // Categories
@@ -63,25 +48,17 @@ var productsService = {
     },
 
     // Products
-    getProducts: function (categoryName, size, pageNumber, pageSize) {
-        console.log(categoryName)
-        if (categoryName==='Formal Shoes')
-        {
-            return pageItems(pageNumber, pageSize, formal);
-        }
-        else if (categoryName==='Sports Shoes')
-        {
-            return pageItems(pageNumber, pageSize, sports);
-        }
-        else 
-        {
-            return pageItems(pageNumber, pageSize, sports)
-        }
+    getProducts: function (productsInput, pageNumber, pageSize) {
+        console.log(productsInput)
+        products=productsInput;
+        return pageItems(pageNumber, pageSize, products)
+        
     },
 
     // Get Single Product
     getProduct: function (productName) {
-        var product = _.find(formal.concat(sports), ['name', productName]);
+
+        var product = _.find(products, function (o) { return o.name ===productName; });
 
         return Promise.resolve(product);
     }
