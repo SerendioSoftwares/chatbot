@@ -6,5 +6,7 @@
     "select_billing_address": "Please select your billing address",
     "add_new_address": "Add a new address",
     "ask_billing_address": "What's your billing address? Include apartment # if needed.",
-    "ask_save_address": "Would you like to save this address?"
+    "ask_save_address": "Would you like to save this address?",
+    "default_user_name": "User",
+
 }

@@ -23,7 +23,11 @@ lib.dialog('/', [
 
     function (session, args, next) 
     {
-        if(args.selection==='Modify Selection')
+        if (session.message.text==="Cart")
+        {
+            next();
+        }
+        else if(args.selection==='Modify Selection')
         {
             session.beginDialog('/');
         }
@@ -78,34 +82,11 @@ lib.dialog('/', [
             next();
         }
     },
-
-
-    function (session) {
-        // Ask for delivery address using 'address' library
-        session.beginDialog('address:/',
-            {
-                promptMessage: session.gettext('provide_delivery_address', session.message.user.name || session.gettext('default_user_name'))
-            });
+    function (session)
+    {
+        session.beginDialog('checkout:/');
     },
 
-
-
-    function (session, args) {
-        // Continue to checkout
-        session.dialogData.recipientAddress = args.address;
-        var order = {
-            products: session.userData.products,
-            delivery: {
-                // date: session.dialogData.deliveryDate,
-                address: session.dialogData.recipientAddress
-            },
-            total: session.userData.total
-            // details: session.dialogData.details,
-            // billingAddress: session.dialogData.billingAddress
-        };
-
-        session.beginDialog('checkout:/', { order: order});
-    }
 ]);
 
 

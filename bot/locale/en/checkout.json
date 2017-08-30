@@ -11,5 +11,7 @@
     "order_number": "Order Number",
     "payment_method": "Payment Method",
     "more_information": "More Information",
-    "error_ocurred": "An error has ocurred: %s"
+    "error_ocurred": "An error has ocurred: %s",
+    "ask_email": "What is your Email Address?",
+    "invalid_email": "Invalid Email, please try again."
 }

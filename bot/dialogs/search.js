@@ -59,8 +59,8 @@ lib.dialog('/', [
     function (session, args, next) 
     {
         parent=session.dialogData.selected;//store parent
-        
-        if(args)
+        console.log(args)
+        if(args.selected)
         {
             
             session.dialogData.selected=args.selected;
@@ -80,8 +80,14 @@ lib.dialog('/', [
         {
             parent.image=parent.images[0];
         }
-
-        session.beginDialog('attributes', {attributes:parent.attributes, current:0});
+        if (parent.attributes.length>0)
+        {
+            session.beginDialog('attributes', {attributes:parent.attributes, current:0});
+        }
+        else
+        {
+            next();
+        }
 
     },
 

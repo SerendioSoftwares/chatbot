@@ -9,38 +9,37 @@ var botUtils = require('./bot/utils');
 /* GET Checkout */
 router.get('/', function (req, res, next) {
   // orderId and user address
-  var orderId = req.query.orderId;
+  // var orderId = 1234;
   var address = botUtils.deserializeAddress(req.query.address);
-  console.log('user address is', address);
+  console.log('-1-1-1-1')
 
-  orderService.retrieveOrder(orderId).then(function (order) {
+  // orderService.retrieveOrder(orderId).then(function (order) {
     // Check order exists
-    if (!order) {
-      throw new Error('Order ID not found');
-    }
+
 
     // Check order if order is already processed
-    if (order.payed) {
-      // Dispatch completion dialog
-      bot.beginDialog(address, 'checkout:completed', { orderId: orderId });
+    // if (order.payed) {
+    //   // Dispatch completion dialog
+    //   bot.beginDialog(address, 'checkout:completed', { orderId: '1234' });
 
-      // Show completion
-      return res.render('checkout/completed', {
-        title: 'Serendio Shoes - Order Processed',
-        order: order
-      });
-    }
+    //   // Show completion
+    //   return res.render('checkout/completed', {
+    //     title: 'Serendio Shoes - Order Processed',
+    //     order: order
+    //   });
+    // }
 
     // Payment form
-    return res.render('checkout/index', {
-      title: 'Serendio Shoes - Order Checkout',
-      address: req.query.address,
-      order: order
+    res.render('checkout/index', {
+      products: JSON.parse(req.query.products),
+      address: address,
+      customer: req.query.customer,
+      OrderId:1234
     });
 
-  }).catch(function (err) {
-    next(err);
-  });
+  // }).catch(function (err) {
+  //   next(err);
+  // });
 
 });
 

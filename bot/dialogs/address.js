@@ -11,7 +11,7 @@ lib.dialog('/', [
     function (session, args) {
         // Ask for address
         args = args || {};
-        var promptMessage = args.promptMessage || 'default_address_prompt';
+        var promptMessage = '';
         session.dialogData.promptMessage = promptMessage;
 
         // Use botbuilder-location dialog for address request

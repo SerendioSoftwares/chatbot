@@ -71,12 +71,10 @@ lib.dialog('modify', basicPrompterWithExpression(function (input) {
 
 lib.dialog('phonenumber', basicPrompterWithRegex(PhoneRegex));
 
-lib.dialog('email',  basicPrompterWithExpression(function (input) {
+lib.dialog('email',  basicPrompterWithRegex(EmailRegex));
 
-    //Email checked against customer DB
 
-    return true;
-}));
+
 function basicPrompterWithRegex(regex) {
     return new builder.IntentDialog()
         .onBegin(function (session, args) {

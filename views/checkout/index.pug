@@ -3,7 +3,7 @@ extends ../layout
 block content
   p
     label(style='font-size: 24px') OrderId:&nbsp;
-    |#{order.id}
+    |#{address}
     <br>
     <br>
   form(method="post")
@@ -20,7 +20,7 @@ block content
           input(type="text", name="phone")
       p
         label(for="address") Address:
-          textarea(name:'body', rows:20)=order.delivery.address
+          textarea(name:'body', rows:20)=products[0]
       p
         <br>
         label(for="landmark") Landmark:
@@ -40,7 +40,7 @@ block content
           input(type="text", name="creditcard", placeholder="Any number will do")
 
       div
-        input(type="hidden", name="orderId", value=order.id)
+        input(type="hidden", name="orderId", value=products)
         input(type="hidden", name="address", value=address)
 
     p.buttons

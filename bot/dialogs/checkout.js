@@ -3,7 +3,7 @@ var builder = require('botbuilder');
 var botUtils = require('../utils');
 var siteUrl = require('../site-url');
 var orderService = require('../../services/orders');
-
+var shop = require('../backend');
 // Checkout flow
 var RestartMessage = 'restart';
 var StartOver = 'start_over';
@@ -11,57 +11,94 @@ var KeepGoing = 'continue';
 var Help = 'help';
 
 var lib = new builder.Library('checkout');
-lib.dialog('/', [
-    function (session, args, next) {
-        args = args || {};
-        var order = args.order;
 
-        if (!order) {
-            // 'Changed my mind' was pressed, continue to next step and prompt for options
-            return next();
+
+
+lib.dialog('/', [
+    function (session) {
+        session.beginDialog('validators:email', {
+            prompt: session.gettext('ask_email'),
+            retryPrompt: session.gettext('invalid_email')
+        }); 
+    },
+    function (session, args, next) {
+        //Check if Customer Exists or not
+        shop.woo().get('customers?email='+args.response, function(err, data, res) {
+            session.dialogData.customer=JSON.parse(res)[0];
+            console.log(JSON.parse(res));
+            next();
+        });
+
+    },
+    function (session, args, next) {
+        //Check if Customer Exists or not
+        console.log(session.dialogData.customer)
+        if(!session.dialogData.customer)
+        {
+            session.send("No Delivery Address Found.")
+            next();
+        } 
+        else
+        {
+            session.send("Your Delivery address is:\n\n" + session.dialogData.customer.shipping);
+
+            session.beginDialog('validators:options', {
+                prompt: session.gettext('Do you wish to proceed with the above address?'),
+                retryPrompt: session.gettext('Invalid Input'),
+                check: ['No', 'Yes']
+            }); 
         }
 
-        // Serialize user address
-        var addressSerialized = botUtils.serializeAddress(session.message.address);
+    },
+    function (session, args, next)
+    {
+        if(args.response==='Yes')
+        {
+            next();
+        }
+        else
+        {
+            session.beginDialog('address:/');
+        }
+    },
+    function (session, args)
+    {
+        session.dialogData.address = args.address;
 
+        var order = session.userData.products;
+
+
+        // Serialize user address
+        var addressSerialized = botUtils.serializeAddress(session.dialogData.address);
+        session.userData.address = session.dialogData.address;
+        session.userData.customer = session.dialogData.customer;
         // Create order (with no payment - pending)
-        orderService.placePendingOrder(order).then(function (order) {
+        // orderService.placePendingOrder(order).then(function (order) {
 
             // Build Checkout url using previously stored Site url
+            console.log('Control')
+            // console.log(session.userData.products)
             var checkoutUrl = util.format(
-                '%s/checkout?orderId=%s&address=%s',
+                '%s/checkout?products=%s&address=%s&customer=%s',
                 siteUrl.retrieve(),
-                encodeURIComponent(order.id),
-                encodeURIComponent(addressSerialized));
+                encodeURIComponent(JSON.stringify(session.userData.products)),
+                encodeURIComponent(addressSerialized),
+                encodeURIComponent(session.dialogData.customer));
 
-            var total = order.total.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0]
-            var messageText = session.gettext('final_price', total);
+            // var messageText = session.gettext('final_price', order.selection.price);
             var card = new builder.HeroCard(session)
-                .text(messageText)
+                .text("Title")
                 .buttons([
-                    builder.CardAction.openUrl(session, checkoutUrl, 'Enter Information'),
+                    builder.CardAction.openUrl(session, checkoutUrl, 'add_credit_card'),
                     builder.CardAction.imBack(session, session.gettext(RestartMessage), RestartMessage)
                 ]);
 
             session.send(new builder.Message(session)
                 .addAttachment(card));
-        });
-    },
-    function (session, args) {
-        builder.Prompts.text(session, 'select_how_to_continue');
-    },
-    function (session, args) {
-        switch (args.response.entity) {
-            case KeepGoing:
-                console.log("keep Going >>>>>");
-                return session.reset();
-            case StartOver:
-                console.log("Reset ------");
-                return session.reset('/');
-            case Help:
-                return session.beginDialog('help:/');
-        }
+        // });
+        //Launch Checkout
     }
+
 ]);
 
 // Checkout completed (initiated from web application. See /checkout.js in the root folder)
@@ -75,32 +112,8 @@ lib.dialog('completed', function (session, args, next) {
             throw new Error(session.gettext('order_not_found'));
         }
 
-
-        // var messageText = session.gettext(
-        //     'order_details',
-        //     order.id,
-        //     order.selection.name,
-        //     order.details.recipient.firstName,
-        //     order.details.recipient.lastName,
-        //     order.details.note
-        //     );
-
         var receiptCard = createReceiptCard(session, orderId);
 
-        // new builder.ReceiptCard(session)
-        //     .title(order.paymentDetails.creditcardHolder)
-        //     .facts([
-        //         builder.Fact.create(session, order.id, 'order_number'),
-        //         builder.Fact.create(session, offuscateNumber(order.paymentDetails.creditcardNumber), 'payment_method')
-        //     ])
-        //     .items([
-        //         builder.ReceiptItem.create(session, order.selection.price, order.selection.name)
-        //             .image(builder.CardImage.create(session, order.selection.imageUrl))
-        //     ])
-        //     .total(order.selection.price)
-        //     .buttons([
-        //         builder.CardAction.openUrl(session, 'https://dev.botframework.com/', 'more_information')
-        //     ]);
 
         var message = new builder.Message(session)
             .addAttachment(receiptCard);
