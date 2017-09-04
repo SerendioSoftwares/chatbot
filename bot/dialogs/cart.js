@@ -1,109 +1,90 @@
 var builder = require('botbuilder');
-
+var cards = require('../cards')
 
 
 var lib = new builder.Library('cart');
 
 lib.dialog('/', [
-    function (session, args, next) {
-        console.log(session.userData)        
-        if (session.userData.products.length===0)
-        {   
-             session.send("Looks like your cart is empty!");
-              var welcomeCard = new builder.HeroCard(session)
-                .buttons([
-                    builder.CardAction.imBack(session, "Shop More", "Shop More"),
-                ]);
-                builder.Prompts.text(session, (new builder.Message(session).addAttachment(welcomeCard)));
-                }
-        else{
-            session.send(new builder.Message(session).addAttachment(createReceiptCard(session)));
-            
-            var welcomeCard = new builder.HeroCard(session)
-            .buttons([
-                builder.CardAction.imBack(session, "Shop More", "Shop More"),
-                builder.CardAction.imBack(session, "Checkout", "Checkout")
-            ]);
-            builder.Prompts.text(session, (new builder.Message(session).addAttachment(welcomeCard)));
-            }
+    function (session, args, next) 
+    {
+        if (session.userData.products.length===0)//No products in cart
+        {   options=['Shop More'];
+            session.send("Looks like your cart is empty!");
+            var reply = cards.buttons(session, options);
+        }
 
+        else
+        {
+            options=['Shop More', 'Checkout', 'Modify Cart'];
+            session.send(cards.receipt(session));
+            var reply = cards.buttons(session, options);
+        }
+        session.beginDialog('validators:options', {//Common Prompt after If-Else
+            prompt: session.send(reply),
+            retryPrompt: session.gettext('Please choose a valid option.'),
+            check: options
+        });
 
-
-        // next();
     },
 
 
-    function (session, args, next) {
+    function (session, args, next) {//Redirect Based on Response
         response = args.response;
-
-
         
         if (response==='Checkout')
         {
-            session.endDialog();
+            session.endDialogWithResult();
         }
         else if(response==='Shop More') 
         {
             session.endDialogWithResult(args);  
         }
-        else if(response==='Modify Cart')
+        else if(response==='Modify Cart' )
         {
             session.beginDialog('modify');
-            
         }
         
     },
-    function (session, args, next)
+
+    function(session)//Return to start of dialog after 'Modify Cart' Dialog is Done
     {
         session.replaceDialog('/');
     }
-
-
-    
 ]);
 
 
 lib.dialog('modify',[
-    function(session, args, next)
+    function(session, args, next)//Show Products in carosel format
     {
-        var cards = getCardsAttachments(session);
 
-    // create reply with Carousel AttachmentLayout
-        var reply = new builder.Message(session)
-        .attachmentLayout(builder.AttachmentLayout.carousel)
-        .attachments(cards);
-
+        var cards = require('../cards');
+        reply = cards.carousel_cart(session, session.userData.products);
+        console.log('Output Card Carousel')
         session.send(reply);
 
-        var welcomeCard = new builder.Message(session).addAttachment(new builder.HeroCard(session)
-        .buttons([
-            builder.CardAction.imBack(session, "Done", "Done")
-        ]));
-
+        var reply = cards.buttons(session, ['Done']);
         session.beginDialog('validators:modify', {
-            prompt: session.send(welcomeCard),
-            retryPrompt: session.gettext('Invalid input, please select a button to continue.')
+            prompt: session.send(reply),
+            retryPrompt: session.gettext('Please choose a valid option.'),
         });
-
-
     },
-    function(session, args, next)
+
+    function(session, args, next)//Either go back if response is "done" or perform mod for product
     {
         response=args.response;
-        if(response==='Done') 
+        if(response==="Done") 
         {
-            session.endDialog();  
+            session.endDialogWithResult();  
         }
         else 
         {
             temp=response.split(' ');
             // response=JSON.parse(response);
-            console.log('000000000000000000');
-            console.log(session.userData.products);
+
             
             session.dialogData.action=temp[0];
             session.dialogData.id=temp[1];
-
+            session.send(session.dialogData.action+": "+temo[2]);
 
             session.dialogData.response=response;
             if (session.dialogData.action==="Delete")
@@ -144,73 +125,8 @@ lib.dialog('quantity', [
         response=args.response;
         session.endDialogWithResult(args);
     },
-    function (session, args)
-    {
-
-    },
 
 ]);
-
-
-function getCardsAttachments(session) {
-    output=[];
-    console.log("Building Cart...");
-    for (i in session.userData.products)
-    {
-        product=session.userData.products[i];
-
-        temp=''//attributes
-        for (j in product.attributes)
-        {
-            temp += product.attributes[j].name + ' : '+product.attributes[j].option + ', ';
-        }
-
-        temp=temp.substr(0, temp.length - 2);
-
-        card=new builder.HeroCard(session)
-        .title(product.name)
-        .subtitle(temp)
-        .text("Price: $"+product.price + ", Quantity: "+product.qty)
-        .images([builder.CardImage.create(session, product.image.src)])
-        .buttons([
-            builder.CardAction.imBack(session, 'Edit '+i+ ' . ' + product.name, 'Edit Quantity'),
-            builder.CardAction.imBack(session, 'Delete '+i+ ' . '+ product.name, 'Delete')]);
-        output.push(card);
-    }
-    return output;
-
-}
-
-function createReceiptCard(session) {
-    console.log("Building Recipt Cart")
-    output=[];
-    total=0;
-    for (i in session.userData.products)
-    {
-
-        product=session.userData.products[i];
-        console.log(product)
-
-        card=builder.ReceiptItem.create(session, "$ "+ product.price.toString(), product.name +' ('+product.qty+')')
-            .image(builder.CardImage.create(session, product.image.src));
-        output.push(card);
-        total+=product.price*product.qty;
-
-    }
-    session.userData.total=total;//for checkout
-    return new builder.ReceiptCard(session)
-        .title('Cart:')
-        .facts([
-            // builder.Fact.create(session, '1234', 'Order Number'),
-            // builder.Fact.create(session, 'VISA 5555-****', 'Payment Method')
-        ])
-        .items(output)
-        .tax('$ 0')
-        .total('$ '+total.toFixed(2))
-        .buttons([
-            builder.CardAction.imBack(session,'Modify Cart', 'Modify Cart')
-        ]);
-}
 
 
 // Export createLibrary() function

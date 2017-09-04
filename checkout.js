@@ -47,7 +47,8 @@ router.get('/', function (req, res, next) {
 router.post('/', function (req, res, next) {
   // orderId and user address
   var orderId = req.body.orderId;
-  var address = botUtils.deserializeAddress(req.body.address);
+  // var address = botUtils.deserializeAddress(req.body.address);
+  var address = req.body.address;
   console.log('user address is', address);
   console.log(req.body);
   // Payment information
@@ -55,6 +56,10 @@ router.post('/', function (req, res, next) {
     creditcardNumber: req.body.creditcard,
     creditcardHolder: req.body.name
   };
+res.render('checkout/completed', {
+      title: 'Serendio Shoes - Order processed',
+      order: processedOrder
+    });
 
 
   // Complete order

@@ -4,6 +4,7 @@ var botUtils = require('../utils');
 var siteUrl = require('../site-url');
 var orderService = require('../../services/orders');
 var shop = require('../backend');
+var cards = require('../cards');
 // Checkout flow
 var RestartMessage = 'restart';
 var StartOver = 'start_over';
@@ -23,24 +24,22 @@ lib.dialog('/', [
     },
     function (session, args, next) {
         //Check if Customer Exists or not
-        shop.woo().get('customers?email='+args.response, function(err, data, res) {
-            session.dialogData.customer=JSON.parse(res)[0];
-            console.log(JSON.parse(res));
+        shop.woo_customer(args.response).then(function (customer) {
+            session.dialogData.customer = customer;
             next();
         });
-
     },
     function (session, args, next) {
-        //Check if Customer Exists or not
+        console.log(session.dialogData.customer.length)
         console.log(session.dialogData.customer)
-        if(!session.dialogData.customer)
+        if(session.dialogData.customer.length===0)//Check if Customer Exists or not (list is empty)
         {
             session.send("No Delivery Address Found.")
             next();
         } 
         else
         {
-            session.send("Your Delivery address is:\n\n" + session.dialogData.customer.shipping);
+            session.send("Your Delivery address is:\n\n" + session.dialogData.customer[0].shipping.address_1 + "\n\n" + session.dialogData.customer[0].shipping.address_2 + "\n\n" + session.dialogData.customer[0].shipping.postcode);
 
             session.beginDialog('validators:options', {
                 prompt: session.gettext('Do you wish to proceed with the above address?'),
@@ -58,32 +57,36 @@ lib.dialog('/', [
         }
         else
         {
-            session.beginDialog('address:/');
+            session.beginDialog('address:/');//Get address
         }
     },
     function (session, args)
     {
         session.dialogData.address = args.address;
-
+        console.log(session.dialogData.address);
         var order = session.userData.products;
-
+        var customer = false;
 
         // Serialize user address
-        var addressSerialized = botUtils.serializeAddress(session.dialogData.address);
-        session.userData.address = session.dialogData.address;
-        session.userData.customer = session.dialogData.customer;
-        // Create order (with no payment - pending)
-        // orderService.placePendingOrder(order).then(function (order) {
+        if(session.dialogData.address)
+        {
+            session.dialogData.address = botUtils.serializeAddress(session.dialogData.address);
+        }
+        
+        if(session.dialogData.customer.length>0)
+        {
+            customer = true;
+        } 
 
             // Build Checkout url using previously stored Site url
-            console.log('Control')
-            // console.log(session.userData.products)
+            console.log('Checkout Completed..')
+
             var checkoutUrl = util.format(
                 '%s/checkout?products=%s&address=%s&customer=%s',
                 siteUrl.retrieve(),
                 encodeURIComponent(JSON.stringify(session.userData.products)),
-                encodeURIComponent(addressSerialized),
-                encodeURIComponent(session.dialogData.customer));
+                encodeURIComponent(session.dialogData.address),
+                encodeURIComponent(customer));
 
             // var messageText = session.gettext('final_price', order.selection.price);
             var card = new builder.HeroCard(session)
@@ -113,10 +116,7 @@ lib.dialog('completed', function (session, args, next) {
         }
 
         var receiptCard = createReceiptCard(session, orderId);
-
-
-        var message = new builder.Message(session)
-            .addAttachment(receiptCard);
+        var message = new builder.Message(session).addAttachment(receiptCard);
 
         session.send(message);
         session.endDialog("Thank you for shopping with us.\n\nDetails about the order and other queries can be directed at the support section of the chatbot.")

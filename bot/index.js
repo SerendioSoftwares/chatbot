@@ -19,7 +19,7 @@ var MainOptions = {
 
 var bot = new builder.UniversalBot(connector, [
 
-    function (session) {
+    function (session) {//First flow dialog
 
     if (localizedRegex(session, [MainOptions.Shop]).test(session.message.text)) {
         // Order Flowers

@@ -3,23 +3,19 @@ var builder = require('botbuilder');
 // var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 // var xhr = new XMLHttpRequest();
 var lib = new builder.Library('shop');
+var cards = require('../cards');
 
 
 
-var model = 'https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/e8b32b8d-5d2d-4ebd-9d5f-af666c748b12?subscription-key=011183f533c94864b0117e8c16778824&timezoneOffset=0&verbose=true&q=';
 var products=[];
 
 
 lib.dialog('/', [
-
-
-    function(session, args, next){
+    function(session, args, next)
+    {
         session.message.text=null;
-       session.beginDialog('search:/');
-        
-        
+        session.beginDialog('search:/');
     },
-
 
     function (session, args, next) 
     {
@@ -33,28 +29,13 @@ lib.dialog('/', [
         }
         else
         {
-            console.log('------=====FK');
-            session.message.text=null;
-            // session.beginDialog('prompt1');  
-            console.log('------=====FK1');
-            var welcomeCard = new builder.Message(session)
-            .addAttachment(new builder.HeroCard(session)
-            .buttons([
-                builder.CardAction.imBack(session, "Shop More", "Shop More"),
-                builder.CardAction.imBack(session, "Cart", "Cart")
-            ]));
-
-            // if (session.message.text)
-            // {
-            //     session.endDialog();
-            // }
-            // else{
-            session.beginDialog('validators:cart', {
-                prompt: session.send(welcomeCard),
-                retryPrompt: session.gettext('Choose from the given options')
-            });
-            
-            // }  
+            options = ['Shop More', 'Cart'];
+            var reply = cards.buttons(session, options);
+            session.beginDialog('validators:options', {
+                prompt: session.send(reply),
+                retryPrompt: session.gettext('Choose from the given options'),
+                check: options
+            });    
         }
         
     },
@@ -89,27 +70,6 @@ lib.dialog('/', [
 
 ]);
 
-
-lib.dialog('prompt1', 
-    function (session, args, next) {
-                console.log('------=====FK1');
-                var welcomeCard = new builder.HeroCard(session)
-        .buttons([
-            builder.CardAction.imBack(session, "Shop More", "Shop More"),
-            builder.CardAction.imBack(session, "Cart", "Cart")
-        ]);
-
-        // if (session.message.text)
-        // {
-        //     session.endDialog();
-        // }
-        // else{
-        session.send(new builder.Message(session)
-        .addAttachment(welcomeCard));
-        // }
-    }
-
-);
 
 
 // Export createLibrary() function

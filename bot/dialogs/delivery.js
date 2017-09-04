@@ -10,9 +10,6 @@ lib.dialog('date', [
     // },
     
     function (session, args) {
-
-        
-        console.log(session.dialogData.recipientSize)
         builder.Prompts.choice(session, 'choose_delivery_date', [
             session.gettext(Today),
             session.gettext(Tomorrow)

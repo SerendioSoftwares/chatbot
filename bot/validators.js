@@ -43,9 +43,7 @@ lib.dialog('category', basicPrompterWithExpression(function (input, check) {
 }));
 
 lib.dialog('attributes', basicPrompterWithExpression(function (input, check){
-    products = shop.result('products');
     output=check;
-    console.log("-----");
     // console.log(check);
     categories=[]
     for (i in output)
@@ -96,13 +94,6 @@ function basicPrompterWithExpressionSize(expression) {
             session.send(args.prompt);
         }).onDefault(function (session) {
             var input = session.message.text;
-            // xhr.open("GET", model+input, false);
-            // xhr.send(xhr.responseText);
-            // console.log("ffffiu");
-            // console.log(xhr.responseText)
-            // var json = JSON.parse(xhr.responseText);
-            // input=json["entities"][0]["entity"];
-            // console.log(input);
             if (expression(input)) {
                 session.endDialogWithResult({ response: input });
             } else {
