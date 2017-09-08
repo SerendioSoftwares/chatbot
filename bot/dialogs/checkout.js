@@ -72,21 +72,26 @@ lib.dialog('/', [
         {
             session.dialogData.address = botUtils.serializeAddress(session.dialogData.address);
         }
-        
+        else
+        {
+            session.dialogData.address = botUtils.serializeAddress(session.dialogData.customer[0].shipping);
+        }
         if(session.dialogData.customer.length>0)
         {
             customer = true;
         } 
+        var customerInfo = botUtils.serializeAddress(session.dialogData.customer)
 
             // Build Checkout url using previously stored Site url
             console.log('Checkout Completed..')
 
             var checkoutUrl = util.format(
-                '%s/checkout?products=%s&address=%s&customer=%s',
+                '%s/checkout?products=%s&address=%s&customer=%s&customerinfo=%s',
                 siteUrl.retrieve(),
                 encodeURIComponent(JSON.stringify(session.userData.products)),
                 encodeURIComponent(session.dialogData.address),
-                encodeURIComponent(customer));
+                encodeURIComponent(customer),
+                encodeURIComponent(customerInfo));
 
             // var messageText = session.gettext('final_price', order.selection.price);
             var card = new builder.HeroCard(session)

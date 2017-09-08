@@ -1,4 +1,6 @@
 var builder = require('botbuilder');
+var _ = require('lodash');
+
 // var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 // var xhr = new XMLHttpRequest();
 var model = 'https://westus.api.cognitive.microsoft.com/luis/v2.0/apps/e8b32b8d-5d2d-4ebd-9d5f-af666c748b12?subscription-key=011183f533c94864b0117e8c16778824&timezoneOffset=0&verbose=true&q=';
@@ -9,20 +11,9 @@ var EmailRegex = new RegExp(/[a-z0-9!#$%&'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+\/
 
 var lib = new builder.Library('validators');
 
-lib.dialog('notes', basicPrompterWithExpression(function (input) {
-    return input && input.length <= 200;
-}));
 
 lib.dialog('cart', basicPrompterWithExpression(function (input) {
     return (input==="Cart" || input==="Shop More");
-}));
-
-lib.dialog('size', basicPrompterWithExpressionSize(function (input) {
-    return input < 13 && input > 7;
-}));
-
-lib.dialog('price', basicPrompterWithExpression(function (input) {
-    return (input>30 && input<120);
 }));
 
 lib.dialog('qty', basicPrompterWithExpression(function (input, check) {
@@ -63,8 +54,29 @@ lib.dialog('problem', basicPrompterWithExpression(function (input) {
     return (input==="Done" || input==="Report Problem" || input==="Check Another Order");
 }));
 
-lib.dialog('modify', basicPrompterWithExpression(function (input) {
-    return (input==="Done" || input.split(' ')[0]==="Edit"|| input.split(' ')[0]==="Delete");
+lib.dialog('modify', basicPrompterWithExpression(function (input, check) {
+    console.log(input)
+    if (input==='Done')
+    {
+        return true;
+    }
+    else
+    {
+        var input=JSON.parse(input);
+        console.log(input);
+        console.log(check[0].name);
+
+        var flag = false;
+        for (i in check)
+        {
+            if (check[i].name===input.name)
+            {
+                flag=true;
+            }
+        }
+        console.log(flag);
+    }
+    return (((input.action==='Edit' || input.action==='Delete')&&(flag)))
 }));
 
 lib.dialog('phonenumber', basicPrompterWithRegex(PhoneRegex));
@@ -82,23 +94,6 @@ function basicPrompterWithRegex(regex) {
             session.endDialogWithResult({ response: session.message.text });
         }).onDefault(function (session) {
             session.send(session.dialogData.retryPrompt);
-        });
-}
-
-function basicPrompterWithExpressionSize(expression) {
-    return new builder.IntentDialog()
-        .onBegin(function (session, args) {
-            // console.log(session);
-            
-            session.dialogData.retryPrompt = args.retryPrompt;
-            session.send(args.prompt);
-        }).onDefault(function (session) {
-            var input = session.message.text;
-            if (expression(input)) {
-                session.endDialogWithResult({ response: input });
-            } else {
-                session.send(session.dialogData.retryPrompt);
-            }
         });
 }
 

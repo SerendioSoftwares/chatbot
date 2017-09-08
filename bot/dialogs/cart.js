@@ -66,34 +66,36 @@ lib.dialog('modify',[
         session.beginDialog('validators:modify', {
             prompt: session.send(reply),
             retryPrompt: session.gettext('Please choose a valid option.'),
+            check: session.userData.products
         });
     },
 
     function(session, args, next)//Either go back if response is "done" or perform mod for product
     {
-        response=args.response;
-        if(response==="Done") 
+        
+        if(args.response==="Done") 
         {
             session.endDialogWithResult();  
         }
         else 
         {
-            temp=response.split(' ');
+            console.log(args.response)
+            response=JSON.parse(args.response);
+            console.log(response)
+
+            session.send(response.action+': '+response.name)
             // response=JSON.parse(response);
 
             
-            session.dialogData.action=temp[0];
-            session.dialogData.id=temp[1];
-            session.send(session.dialogData.action+": "+temo[2]);
+            session.dialogData.id=response.id;
 
-            session.dialogData.response=response;
-            if (session.dialogData.action==="Delete")
+            if (response.action==="Delete")
             {
-                session.userData.products.splice(session.dialogData.id,1);
+                session.userData.products.splice(response.id,1);
                 session.replaceDialog('modify');
             }
-            else if (session.dialogData.action==="Edit") {
-                session.dialogData.check = session.userData.products[session.dialogData.id].stock_quantity;
+            else if (response.action==="Edit") {
+                session.dialogData.check = session.userData.products[response.id].stock_quantity;
                 next();
             }
             
@@ -115,18 +117,7 @@ lib.dialog('modify',[
 
 ]);
 
-lib.dialog('quantity', [
-    function (session)
-    {
-        builder.Prompts.number(session, "How many would you like?")
-    },
-    function (session, args)
-    {
-        response=args.response;
-        session.endDialogWithResult(args);
-    },
 
-]);
 
 
 // Export createLibrary() function

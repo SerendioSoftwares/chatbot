@@ -41,8 +41,9 @@ function cards_cart(session, input)
         .text("Price: $"+current.price + ", Quantity: "+current.qty)
         .images([builder.CardImage.create(session, current.image.src)])
         .buttons([
-            builder.CardAction.imBack(session, 'Edit '+i+ ' . ' + current.name, 'Edit Quantity'),
-            builder.CardAction.imBack(session, 'Delete '+i+ ' . '+ current.name, 'Delete')]);
+            builder.CardAction.postBack(session, '{"action":"Edit", "id":'+ i + ', "name":\"'+ current.name+'\"}', 'Edit Quantity'),
+            builder.CardAction.postBack(session, '{"action":"Delete", "id":'+ i + ', "name":\"'+ current.name+'\"}', 'Delete')
+            ]);
         output.push(card);
     }        
     return output    
