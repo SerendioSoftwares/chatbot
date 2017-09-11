@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html ng-app="chatbot">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./js/css/font-awesome.min.css">
+    <script src="./js/angular.js"></script>
+    <script src="./js/app.js"></script>
+</head>
+<body>
+<div class="container" ng-controller="OrderCtrl">
+    <script>
+        var address = "<%= address %>";
+        var products = <%- products %>;
+        var customer = <%= customer %>;
+        var customerinfo = <%- customerinfo %>;
+    </script>
+    <br/><br/><br/>
+    <div>
+        <form action="/orders" method="post">
+            <p>
+            <h3>Your order will be placed. Please verify order details below.</h3>
+            <br>
+            </p>
+
+            <div class="row">
+                <table class="table table-bordered">
+                    <th><p class="text-center tableheading">Name</p></th>
+                    <th><p class="text-center tableheading">Image</p></th>
+                    <th><p class="text-center tableheading">Price</p></th>
+                    <th><p class="text-center tableheading">Quantity</p></th>
+                    <th><p class="text-center tableheading">Total</p></th>
+                    <tr ng-repeat="prod in products">
+                        <td class="text-center">{{prod.name}}</td>
+                        <td class="text-center"><img ng-src="{{prod.image.src}}" height="150" width="150"></td>
+                        <td class="text-center">{{prod.price}}</td>
+                        <td class="text-center">{{prod.qty}}</td>
+                        <td class="text-center">{{prod.qty * prod.price}}</td>
+                    </tr>
+                </table>
+            </div>
+            <br>
+            <div>
+                <input type="hidden" name="address" value="{{address}}">
+                <input type="hidden" name="products" value="{{products}}">
+                <input type="hidden" name="customer" value="{{customer}}">
+                <input type="hidden" name="customerinfo" value="{{customerinfo}}">
+            </div>
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+</body>
+</html>

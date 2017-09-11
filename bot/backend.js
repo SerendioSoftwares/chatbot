@@ -1,9 +1,9 @@
 var WooCommerceAPI = require('woocommerce-api');
 
 var WooCommerce = new WooCommerceAPI({
-    url: 'http://192.168.1.23', // Your store URL
-    consumerKey: 'ck_a539ec4744f0e631a1a9a961cf868f1480646c1d', // Your consumer key
-    consumerSecret: 'cs_75519a7d7e53f6842b52c9049e646edc6bf5ab68', // Your consumer secret
+    url: 'http://wordpress.serendio.com', // Your store URL
+    consumerKey: 'ck_74e2c7500bfd8612b1f1d7484ae94e3975d8aaf0', // Your consumer key
+    consumerSecret: 'cs_60426098c597edbcbae7e9fec486c4b90cccabf8', // Your consumer secret
     wpAPI: true, // Enable the WP REST API integration
     version: 'wc/v2' // WooCommerce WP REST API version
 });

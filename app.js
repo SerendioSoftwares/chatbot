@@ -11,8 +11,9 @@ var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.engine('html', require('ejs').renderFile);
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+app.set('view engine', 'html');
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -31,13 +32,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // });
 
- app.get('/', function (req, res, next) {
+ /*app.get('/', function (req, res, next) {
       res.render('index', { title: 'Shoe Mart' });
-    });
+    });*/
   
 // Register Checkout page
 var checkout = require('./checkout');
-app.use('/checkout', checkout);
+app.use('/', checkout);
 
 // Register Bot
 var bot = require('./bot');

@@ -35,6 +35,7 @@
     "sync-request": "^4.1.0",
     "uuid": "^3.0.1",
     "woocommerce": "^2.4.0",
-    "woocommerce-api": "^1.4.2"
+    "woocommerce-api": "^1.4.2",
+    "ejs": "^2.5.7"
   }
 }

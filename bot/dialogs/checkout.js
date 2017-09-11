@@ -13,8 +13,6 @@ var Help = 'help';
 
 var lib = new builder.Library('checkout');
 
-
-
 lib.dialog('/', [
     function (session) {
         session.beginDialog('validators:email', {
@@ -30,8 +28,7 @@ lib.dialog('/', [
         });
     },
     function (session, args, next) {
-        console.log(session.dialogData.customer.length)
-        console.log(session.dialogData.customer)
+
         if(session.dialogData.customer.length===0)//Check if Customer Exists or not (list is empty)
         {
             session.send("No Delivery Address Found.")
@@ -63,7 +60,6 @@ lib.dialog('/', [
     function (session, args)
     {
         session.dialogData.address = args.address;
-        console.log(session.dialogData.address);
         var order = session.userData.products;
         var customer = false;
 
@@ -83,10 +79,9 @@ lib.dialog('/', [
         var customerInfo = botUtils.serializeAddress(session.dialogData.customer)
 
             // Build Checkout url using previously stored Site url
-            console.log('Checkout Completed..')
 
             var checkoutUrl = util.format(
-                '%s/checkout?products=%s&address=%s&customer=%s&customerinfo=%s',
+                '%s/?products=%s&address=%s&customer=%s&customerinfo=%s',
                 siteUrl.retrieve(),
                 encodeURIComponent(JSON.stringify(session.userData.products)),
                 encodeURIComponent(session.dialogData.address),
@@ -139,7 +134,7 @@ function createReceiptCard(session, id) {
     for (i in session.userData.products)
     {
         product=session.userData.products[i];
-        card=builder.ReceiptItem.create(session, "$ "+ product.price, product.name +' ('+product.qty+')')
+        card=builder.ReceiptItem.create(session, "$ "+ product.price, product.name +' ('+ product.qty +')')
             .image(builder.CardImage.create(session, product.imageUrl));
         output.push(card);
         total+=product.price*product.qty;
@@ -147,7 +142,7 @@ function createReceiptCard(session, id) {
     }
     session.userData.total=total;//for checkout
     return new builder.ReceiptCard(session)
-        .title("Order No: 1234")
+        .title("Order No: "+id)
         .facts([
             // builder.Fact.create(session, name, 'Name'),
             builder.Fact.create(session, 'Debit/Credit Card', 'Payment Method')
@@ -157,7 +152,6 @@ function createReceiptCard(session, id) {
         .total('$ '+total.toFixed(2))
     ;
 }
-
 
 
 // Helpers

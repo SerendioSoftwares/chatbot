@@ -63,7 +63,8 @@ lib.dialog('/', [
             {
                 session.dialogData.selected.stock=parent.stock;
             }
-
+            session.dialogData.selected.var_id = session.dialogData.selected.id;
+            session.dialogData.selected.id = parent.id;
             
         }
         else
