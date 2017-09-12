@@ -5,7 +5,7 @@ var Promise = require('bluebird');
 var shop = require('../bot/backend');
 
 var OrderService = {
-    placePendingOrder: async function (order) {
+    placePendingOrder: function (order) {
         var data = {
           payment_method: 'bacs',
           payment_method_title: 'Direct Bank Transfer',
@@ -47,7 +47,7 @@ var OrderService = {
           ]
         };
         console.log('11111111111111')
-        await shop.woo().postAsync('orders').then(function(result) {
+        shop.woo().postAsync('orders').then(function(result) {
           temp=JSON.parse(res);
           console.log(temp);    
             return temp;

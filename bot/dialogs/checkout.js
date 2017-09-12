@@ -81,18 +81,18 @@ lib.dialog('/', [
             // Build Checkout url using previously stored Site url
 
             var checkoutUrl = util.format(
-                '%s/?products=%s&address=%s&customer=%s&customerinfo=%s',
+                '%s/?products=%s&address=%s&customer=%s&customerinfo=%s&bot_address=%s',
                 siteUrl.retrieve(),
                 encodeURIComponent(JSON.stringify(session.userData.products)),
                 encodeURIComponent(session.dialogData.address),
                 encodeURIComponent(customer),
-                encodeURIComponent(customerInfo));
+                encodeURIComponent(customerInfo),
+                encodeURIComponent(botUtils.serializeAddress((session.message.address))));
 
             // var messageText = session.gettext('final_price', order.selection.price);
             var card = new builder.HeroCard(session)
-                .text("Title")
                 .buttons([
-                    builder.CardAction.openUrl(session, checkoutUrl, 'add_credit_card'),
+                    builder.CardAction.openUrl(session, checkoutUrl, 'Place Order'),
                     builder.CardAction.imBack(session, session.gettext(RestartMessage), RestartMessage)
                 ]);
 
@@ -110,10 +110,6 @@ lib.dialog('completed', function (session, args, next) {
     var orderId = args.orderId;
 
     // Retrieve order and create ReceiptCard
-    orderService.retrieveOrder(orderId).then(function (order) {
-        if (!order) {
-            throw new Error(session.gettext('order_not_found'));
-        }
 
         var receiptCard = createReceiptCard(session, orderId);
         var message = new builder.Message(session).addAttachment(receiptCard);
@@ -121,9 +117,7 @@ lib.dialog('completed', function (session, args, next) {
         session.send(message);
         session.endDialog("Thank you for shopping with us.\n\nDetails about the order and other queries can be directed at the support section of the chatbot.")
         // session.endDialog("End");
-    }).catch(function (err) {
-        session.endDialog(session.gettext('error_ocurred', err.message));
-    });
+
 });
 
 
@@ -135,7 +129,7 @@ function createReceiptCard(session, id) {
     {
         product=session.userData.products[i];
         card=builder.ReceiptItem.create(session, "$ "+ product.price, product.name +' ('+ product.qty +')')
-            .image(builder.CardImage.create(session, product.imageUrl));
+            .image(builder.CardImage.create(session, product.image.src));
         output.push(card);
         total+=product.price*product.qty;
 

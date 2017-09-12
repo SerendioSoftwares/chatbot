@@ -6,12 +6,12 @@ var orderService = require('./services/orders');
 var bot = require('./bot');
 var botUtils = require('./bot/utils');
 var shop = require('./bot/backend');
-
+var bot_address=null;
 /* GET Checkout */
 router.get('/', function (req, res, next) {
 
     var address = botUtils.deserializeAddress(req.query.address);
-    
+    bot_address = botUtils.deserializeAddress(req.query.bot_address);
 
     if (req.query.customer==='false'){
         console.log('************** Customer doesnt exists');
@@ -24,7 +24,6 @@ router.get('/', function (req, res, next) {
     }else {
         console.log('************** Customer exists');
 
-        //console.log(customerinfo);
         var customerinfo= botUtils.deserializeAddress(req.query.customerinfo);
 
         res.render('order', {
@@ -45,7 +44,6 @@ router.post('/', function (req, res, next) {
     var address= req.body.address;
     var customer= req.body.customer;
     console.log('--------------------------');
-    
 
     var data = {
         email: response.emailid,
@@ -80,16 +78,15 @@ router.post('/', function (req, res, next) {
     };
     shop.woo().post('customers', data, function(err, data1, result) {
         console.log('Customer created successfully');
-        console.log(result);
         
-        var customerinfo = data;
-        console.log(customerinfo);
+        var customerinfo =[];
+        customerinfo.push(data);
         res.render('order', {
         title: 'Serendio Shoes - Customer created successfully',
         products: products,
         address: address,
         customer: customer,
-        customerinfo: customerinfo
+        customerinfo: JSON.stringify(customerinfo)
     });
     });
 
@@ -104,9 +101,6 @@ router.post('/orders', function (req, resp, next) {
     var customer= req.body.customer;
     var customerinfo= JSON.parse(req.body.customerinfo);
 
-    console.log(address);
-    console.log(customerinfo[0]);
-
     var billing = customerinfo[0].billing;
     var shipping = customerinfo[0].shipping;
 
@@ -116,13 +110,11 @@ router.post('/orders', function (req, resp, next) {
         var prod={};
         prod.product_id=products[i].id;
         if (products[i].variations != undefined && products[i].variations.length>0) {
-            //console.log(products[i].variations);
             prod.variation_id=products[i].variations[0];
         }
         prod.quantity=products[i].qty;
         line_items.push(prod);
     }
-    console.log(line_items);
 
     var data = {
         payment_method: 'bacs',
@@ -143,8 +135,9 @@ router.post('/orders', function (req, resp, next) {
      shop.woo().post('orders',data, function(err, data, res) {
         
         res=JSON.parse(res);
-        console.log(res);
-        bot.beginDialog(address, 'checkout:completed', { orderId: res.id });
+        //console.log('bot address is :', bot_address);
+       // console.log(res);
+        bot.beginDialog(bot_address, 'checkout:completed', { orderId: res.id });
         return resp.render('completed', {
             title: 'Order created successfully'
           
